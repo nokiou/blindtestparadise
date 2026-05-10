@@ -168,6 +168,9 @@
 
 <!-- ATTENTE JOUEUR -->
 <div id="screen-waiting" class="screen">
+  <div id="connection-banner" style="display:none;position:fixed;top:0;left:0;right:0;background:#7c3aed;color:white;padding:10px;text-align:center;font-size:13px;font-weight:600;align-items:center;justify-content:center;gap:8px;z-index:999;">
+    ⏳ Reconnexion en cours...
+  </div>
   <div class="logo" style="font-size:32px;">🎵 Blind Test</div>
   <div style="color:#7c6fa0;font-size:14px;margin-bottom:8px;">Room</div>
   <div style="font-size:32px;font-weight:700;letter-spacing:4px;color:#f0eeff;margin-bottom:32px;" id="waiting-room-code">----</div>
@@ -178,6 +181,9 @@
 
 <!-- ECRAN JOUEUR EN JEU -->
 <div id="screen-player" class="screen">
+  <div id="connection-banner-play" style="display:none;position:fixed;top:0;left:0;right:0;background:#7c3aed;color:white;padding:10px;text-align:center;font-size:13px;font-weight:600;z-index:999;">
+    ⏳ Reconnexion en cours...
+  </div>
   <div style="font-size:20px;font-weight:700;color:#a78bfa;margin-bottom:24px;" id="player-room-label">Room ----</div>
   <div class="buzz-container">
     <div class="my-score-display">
@@ -214,6 +220,7 @@ const auth = firebase.auth();
 let myUid = null, myName = '', myRole = '', myRoom = '', roomRef = null;
 let audioFiles = [], currentTrack = -1, isPlaying = false;
 let ytPlayer = null, ytLoaded = false, currentTab = 'mp3';
+let myLastScore = 0;
 
 function show(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -231,6 +238,20 @@ function genCode() {
 auth.signInAnonymously().then(r => {
   myUid = r.user.uid;
 }).catch(e => log('Erreur connexion Firebase : ' + e.message));
+
+// Reconnexion automatique après veille
+db.ref('.info/connected').on('value', async snap => {
+  if (!snap.val() || !roomRef || myRole !== 'player') return;
+  // On est reconnecté — on se réenregistre si nécessaire
+  const playerSnap = await roomRef.child('players/' + myUid).get();
+  if (!playerSnap.exists() && myName) {
+    await roomRef.child('players/' + myUid).set({ name: myName, role: 'player', score: myLastScore, blocked: false, buzzed: false });
+  } else if (playerSnap.exists()) {
+    await roomRef.child('players/' + myUid).update({ online: true });
+  }
+  // Marquer hors ligne à la prochaine déconnexion (sans supprimer)
+  roomRef.child('players/' + myUid).onDisconnect().update({ online: false, buzzed: false });
+});
 
 async function createRoom() {
   myName = document.getElementById('mj-name').value.trim();
@@ -256,8 +277,8 @@ async function joinRoom() {
   myRole = 'player';
   myRoom = code;
   roomRef = db.ref('rooms/' + myRoom);
-  await roomRef.child('players/' + myUid).set({ name: myName, role: 'player', score: 0, blocked: false, buzzed: false });
-  roomRef.child('players/' + myUid).onDisconnect().remove();
+  await roomRef.child('players/' + myUid).set({ name: myName, role: 'player', score: 0, blocked: false, buzzed: false, online: true });
+  roomRef.child('players/' + myUid).onDisconnect().update({ online: false, buzzed: false });
   document.getElementById('waiting-room-code').textContent = myRoom;
   document.getElementById('player-room-label').textContent = 'Room ' + myRoom;
   listenRoomPlayer();
@@ -284,9 +305,11 @@ function renderPlayersMJ(players) {
   }
   grid.innerHTML = entries.map(([uid, p]) => {
     const initials = p.name.substring(0, 2).toUpperCase();
+    const offlineBadge = p.online === false ? '<div style="position:absolute;top:-8px;left:-8px;background:#4a4060;border-radius:20px;padding:3px 8px;font-size:11px;color:#aaa;">hors ligne</div>' : '';
     return `
-      <div class="player-card ${p.buzzed ? 'buzzed' : ''} ${p.blocked && !p.buzzed ? 'blocked' : ''}">
+      <div class="player-card ${p.buzzed ? 'buzzed' : ''} ${p.blocked && !p.buzzed ? 'blocked' : ''}" style="${p.online === false ? 'opacity:0.4;' : ''}">
         ${p.buzzed ? '<div class="buzz-badge">BUZZ !</div>' : ''}
+        ${offlineBadge}
         <div class="player-avatar">${initials}</div>
         <div class="player-name">${p.name}</div>
         <div class="player-score">${p.score || 0} pt</div>
@@ -314,7 +337,8 @@ function listenRoomPlayer() {
   roomRef.child('players/' + myUid).on('value', snap => {
     const me = snap.val();
     if (!me) return;
-    document.getElementById('my-score-display').textContent = me.score || 0;
+    myLastScore = me.score || 0;
+    document.getElementById('my-score-display').textContent = myLastScore;
     updateBuzzBtn(me);
   });
   roomRef.child('players').on('value', snap => {
@@ -324,6 +348,14 @@ function listenRoomPlayer() {
     const state = snap.val();
     if (state === 'playing') show('player');
     else if (state === 'waiting') show('waiting');
+  });
+  // Indicateur connexion temps réel
+  db.ref('.info/connected').on('value', snap => {
+    const banner = document.getElementById('connection-banner');
+    const banner2 = document.getElementById('connection-banner-play');
+    const show = snap.val() ? 'none' : 'flex';
+    if (banner) banner.style.display = show;
+    if (banner2) banner2.style.display = show;
   });
 }
 
