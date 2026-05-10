@@ -105,6 +105,17 @@
 <div id="screen-home" class="screen active">
   <div class="logo">🎵 Blind Test</div>
   <div class="tagline">Paradis</div>
+
+  <!-- Bandeau de reprise de session MJ (caché par défaut) -->
+  <div id="resume-banner" style="display:none;width:100%;max-width:380px;margin-bottom:16px;background:#1a1630;border:1px solid #a78bfa;border-radius:14px;padding:18px 20px;">
+    <div style="font-size:13px;color:#a78bfa;font-weight:600;margin-bottom:4px;">⚡ Session en cours</div>
+    <div style="font-size:14px;color:#f0eeff;margin-bottom:12px;" id="resume-label">Room <strong></strong> — reprendre en tant que MJ ?</div>
+    <div style="display:flex;gap:8px;">
+      <button class="btn btn-primary" style="flex:1;padding:10px;" onclick="resumeSession()">Reprendre la room</button>
+      <button class="btn btn-secondary" style="flex:1;padding:10px;margin:0;" onclick="clearSession()">Nouvelle partie</button>
+    </div>
+  </div>
+
   <div class="card">
     <h2>Rejoindre une room</h2>
     <input type="text" id="player-name" placeholder="Ton prénom" maxlength="16" />
@@ -160,6 +171,7 @@
   <div class="action-row">
     <button class="btn btn-secondary" onclick="unblockAll()">🔓 Débloquer tous les buzzers</button>
     <button class="btn btn-secondary" onclick="resetScores()" style="color:#f472b6;border-color:#3a1a2a;">🔄 Reset scores</button>
+    <button class="btn btn-secondary" onclick="endSession()" style="color:#7c6fa0;border-color:#2a2440;">🚪 Terminer</button>
   </div>
 
   <div id="yt-iframe-container"><div id="yt-player"></div></div>
@@ -263,9 +275,41 @@ async function createRoom() {
   roomRef = db.ref('rooms/' + myRoom);
   await roomRef.set({ created: Date.now(), state: 'waiting', buzzedBy: null });
   await roomRef.child('players/' + myUid).set({ name: myName, role: 'mj', score: 0, blocked: false, buzzed: false });
+  localStorage.setItem('bt_mj_session', JSON.stringify({ room: myRoom, name: myName }));
   listenRoomMJ();
   show('mj');
 }
+
+async function resumeSession() {
+  const saved = JSON.parse(localStorage.getItem('bt_mj_session') || 'null');
+  if (!saved) return;
+  if (!myUid) { log('Connexion Firebase en cours, réessaie...'); return; }
+  const snap = await db.ref('rooms/' + saved.room).get();
+  if (!snap.exists()) { log('La room a expiré, crée-en une nouvelle.'); clearSession(); return; }
+  myRole = 'mj';
+  myName = saved.name;
+  myRoom = saved.room;
+  roomRef = db.ref('rooms/' + myRoom);
+  document.getElementById('display-code').textContent = myRoom;
+  await roomRef.child('players/' + myUid).set({ name: myName, role: 'mj', score: 0, blocked: false, buzzed: false });
+  listenRoomMJ();
+  show('mj');
+}
+
+function clearSession() {
+  localStorage.removeItem('bt_mj_session');
+  document.getElementById('resume-banner').style.display = 'none';
+}
+
+// Vérifie une session MJ sauvegardée au chargement
+window.addEventListener('load', () => {
+  const saved = JSON.parse(localStorage.getItem('bt_mj_session') || 'null');
+  if (saved) {
+    const banner = document.getElementById('resume-banner');
+    banner.style.display = 'block';
+    banner.querySelector('#resume-label').innerHTML = `Room <strong style="color:#a78bfa;letter-spacing:2px">${saved.room}</strong> — reprendre en tant que MJ ?`;
+  }
+});
 
 async function joinRoom() {
   myName = document.getElementById('player-name').value.trim();
@@ -428,6 +472,13 @@ async function resetScores() {
   const updates = {};
   Object.keys(snap.val() || {}).forEach(uid => { updates[uid + '/score'] = 0; });
   await roomRef.child('players').update(updates);
+}
+
+async function endSession() {
+  if (!confirm('Terminer la partie et fermer la room ?')) return;
+  await roomRef.remove();
+  clearSession();
+  location.reload();
 }
 
 function switchTab(tab, el) {
