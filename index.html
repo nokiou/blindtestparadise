@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Blind Test Paradis</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: system-ui, sans-serif; background: #0a0a12; color: #f0eeff; min-height: 100vh; }
+
+  .screen { display: none; min-height: 100vh; flex-direction: column; align-items: center; justify-content: center; padding: 24px; }
+  .screen.active { display: flex; }
+
+  .logo { font-size: 48px; font-weight: 700; letter-spacing: -2px; background: linear-gradient(135deg, #a78bfa, #f472b6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 8px; text-align: center; }
+  .tagline { color: #7c6fa0; font-size: 14px; text-align: center; margin-bottom: 48px; letter-spacing: 2px; text-transform: uppercase; }
+  .card { background: #13111f; border: 1px solid #2a2440; border-radius: 20px; padding: 32px; width: 100%; max-width: 380px; }
+  .card h2 { font-size: 16px; font-weight: 600; color: #a78bfa; margin-bottom: 20px; letter-spacing: 1px; text-transform: uppercase; }
+  input[type="text"] { width: 100%; background: #0a0a12; border: 1px solid #2a2440; border-radius: 10px; padding: 12px 16px; color: #f0eeff; font-size: 15px; outline: none; transition: border 0.2s; margin-bottom: 12px; }
+  input[type="text"]:focus { border-color: #a78bfa; }
+  input[type="text"]::placeholder { color: #4a4060; }
+  .btn { width: 100%; padding: 13px; border-radius: 10px; border: none; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.15s; }
+  .btn-primary { background: linear-gradient(135deg, #7c3aed, #db2777); color: white; }
+  .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+  .btn-secondary { background: transparent; border: 1px solid #2a2440; color: #a78bfa; margin-top: 8px; }
+  .btn-secondary:hover { background: #1a1630; }
+  .divider { text-align: center; color: #4a4060; font-size: 13px; margin: 16px 0; }
+
+  .header { width: 100%; max-width: 700px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+  .room-code { background: #1a1630; border: 1px solid #2a2440; border-radius: 10px; padding: 8px 16px; font-size: 13px; color: #7c6fa0; }
+  .room-code span { color: #a78bfa; font-weight: 700; font-size: 18px; letter-spacing: 3px; }
+  .players-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; width: 100%; max-width: 700px; margin-bottom: 24px; }
+  .player-card { background: #13111f; border: 1px solid #2a2440; border-radius: 14px; padding: 16px; text-align: center; position: relative; transition: border 0.2s; }
+  .player-card.buzzed { border-color: #f472b6; animation: pulse-pink 0.6s ease; }
+  .player-card.blocked { opacity: 0.5; }
+  .player-avatar { width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg, #7c3aed, #db2777); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 18px; margin: 0 auto 8px; }
+  .player-name { font-size: 13px; font-weight: 600; color: #f0eeff; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .player-score { font-size: 22px; font-weight: 700; color: #a78bfa; }
+  .buzz-badge { position: absolute; top: -8px; right: -8px; background: #f472b6; border-radius: 20px; padding: 3px 8px; font-size: 11px; font-weight: 700; color: white; }
+  .score-btns { display: flex; gap: 4px; margin-top: 8px; }
+  .score-btn { flex: 1; padding: 4px; border-radius: 6px; border: 1px solid #2a2440; background: transparent; color: #a78bfa; cursor: pointer; font-size: 16px; transition: background 0.15s; }
+  .score-btn:hover { background: #1a1630; }
+  .score-btn.good { border-color: #10b981; color: #10b981; }
+  .score-btn.good:hover { background: #0d2e22; }
+
+  .audio-panel { background: #13111f; border: 1px solid #2a2440; border-radius: 20px; padding: 24px; width: 100%; max-width: 700px; margin-bottom: 20px; }
+  .audio-panel h3 { font-size: 13px; color: #7c6fa0; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px; }
+  .tabs { display: flex; gap: 8px; margin-bottom: 16px; }
+  .tab { padding: 7px 16px; border-radius: 8px; border: 1px solid #2a2440; background: transparent; color: #7c6fa0; cursor: pointer; font-size: 13px; transition: all 0.15s; }
+  .tab.active { background: #1a1630; border-color: #a78bfa; color: #a78bfa; }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+  .yt-input-row { display: flex; gap: 8px; }
+  .yt-input-row input { flex: 1; margin-bottom: 0; }
+  .btn-sm { padding: 10px 16px; border-radius: 10px; border: none; background: linear-gradient(135deg, #7c3aed, #db2777); color: white; font-size: 14px; font-weight: 600; cursor: pointer; white-space: nowrap; transition: opacity 0.15s; }
+  .btn-sm:hover { opacity: 0.85; }
+  .controls { display: flex; gap: 10px; margin-top: 14px; align-items: center; flex-wrap: wrap; }
+  .ctrl-btn { padding: 10px 20px; border-radius: 10px; border: 1px solid #2a2440; background: #0a0a12; color: #f0eeff; font-size: 14px; cursor: pointer; transition: all 0.15s; }
+  .ctrl-btn:hover { background: #1a1630; }
+  .ctrl-btn.play { background: linear-gradient(135deg, #7c3aed, #db2777); border: none; }
+  .ctrl-btn.stop { border-color: #7c6fa0; color: #7c6fa0; }
+  .now-playing { flex: 1; font-size: 13px; color: #7c6fa0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 80px; }
+  .now-playing span { color: #f0eeff; }
+  .file-drop { border: 2px dashed #2a2440; border-radius: 12px; padding: 28px; text-align: center; color: #4a4060; cursor: pointer; transition: border 0.2s; }
+  .file-drop:hover { border-color: #a78bfa; color: #a78bfa; }
+  .file-list { margin-top: 12px; max-height: 180px; overflow-y: auto; }
+  .file-item { display: flex; align-items: center; padding: 8px 12px; border-radius: 8px; background: #0a0a12; margin-bottom: 6px; cursor: pointer; transition: background 0.15s; }
+  .file-item:hover { background: #1a1630; }
+  .file-item.current { background: #1a1630; border: 1px solid #a78bfa; }
+  .file-item-name { font-size: 13px; color: #f0eeff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
+
+  .buzz-container { display: flex; flex-direction: column; align-items: center; gap: 32px; }
+  .buzz-btn { width: 220px; height: 220px; border-radius: 50%; border: none; cursor: pointer; font-size: 24px; font-weight: 800; transition: all 0.1s; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 4px; }
+  .buzz-btn.ready { background: radial-gradient(circle at 35% 35%, #f472b6, #7c3aed); box-shadow: 0 0 60px rgba(167,139,250,0.4), 0 0 120px rgba(244,114,182,0.2); }
+  .buzz-btn.ready:active { transform: scale(0.93); }
+  .buzz-btn.blocked { background: #1a1630; box-shadow: none; color: #4a4060; cursor: not-allowed; }
+  .buzz-btn.buzzed-state { background: radial-gradient(circle at 35% 35%, #10b981, #065f46); box-shadow: 0 0 60px rgba(16,185,129,0.4); cursor: not-allowed; }
+  .buzz-icon { font-size: 52px; line-height: 1; }
+  .buzz-label { font-size: 16px; font-weight: 600; color: rgba(255,255,255,0.8); }
+  .status-msg { font-size: 15px; color: #7c6fa0; text-align: center; }
+  .my-score-display { background: #13111f; border: 1px solid #2a2440; border-radius: 16px; padding: 20px 40px; text-align: center; }
+  .my-score-display .label { font-size: 12px; color: #7c6fa0; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 4px; }
+  .my-score-display .value { font-size: 48px; font-weight: 700; color: #a78bfa; }
+
+  .waiting-list { width: 100%; max-width: 380px; margin-top: 24px; }
+  .waiting-player { display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: #13111f; border: 1px solid #2a2440; border-radius: 10px; margin-bottom: 8px; animation: fadeIn 0.3s ease; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: #10b981; }
+  .waiting-name { font-size: 14px; color: #f0eeff; }
+  .waiting-hint { color: #4a4060; font-size: 13px; text-align: center; margin-top: 8px; }
+
+  @keyframes pulse-pink { 0%,100% { box-shadow: 0 0 0 0 rgba(244,114,182,0); } 50% { box-shadow: 0 0 0 12px rgba(244,114,182,0.3); } }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+  .log { font-size: 12px; color: #f472b6; margin-top: 10px; text-align: center; min-height: 18px; }
+  .btn-unblock { margin-top: 6px; padding: 5px 10px; border-radius: 6px; border: 1px solid #7c6fa0; background: transparent; color: #7c6fa0; font-size: 12px; cursor: pointer; width: 100%; }
+  .btn-unblock:hover { background: #1a1630; }
+  .section-title { width: 100%; max-width: 700px; font-size: 13px; color: #7c6fa0; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+  .action-row { display: flex; gap: 10px; width: 100%; max-width: 700px; margin-bottom: 16px; flex-wrap: wrap; }
+  .action-row .btn { width: auto; flex: 1; min-width: 160px; }
+  #yt-iframe-container { position: absolute; width: 1px; height: 1px; overflow: hidden; left: -9999px; }
+</style>
+</head>
+<body>
+
+<!-- ACCUEIL -->
+<div id="screen-home" class="screen active">
+  <div class="logo">🎵 Blind Test</div>
+  <div class="tagline">Paradis</div>
+  <div class="card">
+    <h2>Rejoindre une room</h2>
+    <input type="text" id="player-name" placeholder="Ton prénom" maxlength="16" />
+    <input type="text" id="room-code-join" placeholder="Code de la room (ex: ABCD)" maxlength="6" style="text-transform:uppercase" />
+    <button class="btn btn-primary" onclick="joinRoom()">Rejoindre →</button>
+    <div class="divider">— ou —</div>
+    <input type="text" id="mj-name" placeholder="Ton prénom (Maître du Jeu)" maxlength="16" />
+    <button class="btn btn-secondary" onclick="createRoom()">Créer une room (MJ)</button>
+    <div class="log" id="home-log"></div>
+  </div>
+</div>
+
+<!-- ECRAN MJ -->
+<div id="screen-mj" class="screen" style="justify-content:flex-start; padding-top:32px;">
+  <div class="header">
+    <div style="font-size:18px;font-weight:700;color:#a78bfa;">🎛 Maître du Jeu</div>
+    <div class="room-code">Room : <span id="display-code">----</span></div>
+  </div>
+
+  <div class="audio-panel">
+    <h3>🎵 Source musicale</h3>
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('mp3', this)">📁 MP3 locaux</button>
+      <button class="tab" onclick="switchTab('youtube', this)">▶ YouTube</button>
+    </div>
+    <div id="tab-mp3" class="tab-content active">
+      <div class="file-drop" id="file-drop" onclick="document.getElementById('file-input').click()">
+        <div style="font-size:28px;margin-bottom:6px;">📂</div>
+        <div>Cliquer pour charger des MP3</div>
+        <div style="font-size:12px;margin-top:4px;">ou glisser-déposer ici</div>
+      </div>
+      <input type="file" id="file-input" accept="audio/*" multiple style="display:none" onchange="loadFiles(this.files)" />
+      <div class="file-list" id="file-list"></div>
+    </div>
+    <div id="tab-youtube" class="tab-content">
+      <div class="yt-input-row">
+        <input type="text" id="yt-url" placeholder="URL YouTube (ex: https://youtu.be/...)" />
+        <button class="btn-sm" onclick="loadYoutube()">Charger</button>
+      </div>
+      <div style="font-size:12px;color:#4a4060;margin-top:8px;">⚠ Certaines vidéos bloquent la lecture embarquée</div>
+    </div>
+    <div class="controls">
+      <button class="ctrl-btn play" onclick="togglePlay()" id="play-btn">▶ Lire</button>
+      <button class="ctrl-btn stop" onclick="stopMusic()">⏹ Stop</button>
+      <button class="ctrl-btn" onclick="nextTrack()">⏭ Suivant</button>
+      <div class="now-playing">En cours : <span id="now-playing-name">—</span></div>
+    </div>
+  </div>
+
+  <div class="section-title">Joueurs connectés</div>
+  <div class="players-grid" id="players-grid"></div>
+
+  <div class="action-row">
+    <button class="btn btn-secondary" onclick="unblockAll()">🔓 Débloquer tous les buzzers</button>
+    <button class="btn btn-secondary" onclick="resetScores()" style="color:#f472b6;border-color:#3a1a2a;">🔄 Reset scores</button>
+  </div>
+
+  <div id="yt-iframe-container"><div id="yt-player"></div></div>
+  <audio id="audio-player"></audio>
+</div>
+
+<!-- ATTENTE JOUEUR -->
+<div id="screen-waiting" class="screen">
+  <div class="logo" style="font-size:32px;">🎵 Blind Test</div>
+  <div style="color:#7c6fa0;font-size:14px;margin-bottom:8px;">Room</div>
+  <div style="font-size:32px;font-weight:700;letter-spacing:4px;color:#f0eeff;margin-bottom:32px;" id="waiting-room-code">----</div>
+  <div style="color:#a78bfa;font-weight:600;margin-bottom:8px;">En attente du Maître du Jeu...</div>
+  <div class="waiting-list" id="waiting-players"></div>
+  <div class="waiting-hint">La partie commencera quand le MJ lancera la musique</div>
+</div>
+
+<!-- ECRAN JOUEUR EN JEU -->
+<div id="screen-player" class="screen">
+  <div style="font-size:20px;font-weight:700;color:#a78bfa;margin-bottom:24px;" id="player-room-label">Room ----</div>
+  <div class="buzz-container">
+    <div class="my-score-display">
+      <div class="label">Mon score</div>
+      <div class="value" id="my-score-display">0</div>
+    </div>
+    <button class="buzz-btn ready" id="buzz-btn" onclick="buzz()">
+      <div class="buzz-icon">🔔</div>
+      <div class="buzz-label">BUZZER !</div>
+    </button>
+    <div class="status-msg" id="player-status">Écoute la musique...</div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyA88T-u3agLgxbGcJvYT0JgelIncyuVL8s",
+  authDomain: "blindtestparadis.firebaseapp.com",
+  databaseURL: "https://blindtestparadis-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "blindtestparadis",
+  storageBucket: "blindtestparadis.firebasestorage.app",
+  messagingSenderId: "124805001518",
+  appId: "1:124805001518:web:6604953e8192028e9c8abf",
+  measurementId: "G-ZQSZQP611J"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+const auth = firebase.auth();
+
+let myUid = null, myName = '', myRole = '', myRoom = '', roomRef = null;
+let audioFiles = [], currentTrack = -1, isPlaying = false;
+let ytPlayer = null, ytLoaded = false, currentTab = 'mp3';
+
+function show(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + id).classList.add('active');
+}
+
+function log(msg) {
+  document.getElementById('home-log').textContent = msg;
+}
+
+function genCode() {
+  return Math.random().toString(36).substring(2, 6).toUpperCase();
+}
+
+auth.signInAnonymously().then(r => {
+  myUid = r.user.uid;
+}).catch(e => log('Erreur connexion Firebase : ' + e.message));
+
+async function createRoom() {
+  myName = document.getElementById('mj-name').value.trim();
+  if (!myName) { log('Entre ton prénom !'); return; }
+  if (!myUid) { log('Connexion Firebase en cours, réessaie...'); return; }
+  myRole = 'mj';
+  myRoom = genCode();
+  document.getElementById('display-code').textContent = myRoom;
+  roomRef = db.ref('rooms/' + myRoom);
+  await roomRef.set({ created: Date.now(), state: 'waiting', buzzedBy: null });
+  await roomRef.child('players/' + myUid).set({ name: myName, role: 'mj', score: 0, blocked: false, buzzed: false });
+  listenRoomMJ();
+  show('mj');
+}
+
+async function joinRoom() {
+  myName = document.getElementById('player-name').value.trim();
+  const code = document.getElementById('room-code-join').value.trim().toUpperCase();
+  if (!myName || !code) { log('Remplis les deux champs !'); return; }
+  if (!myUid) { log('Connexion Firebase en cours, réessaie...'); return; }
+  const snap = await db.ref('rooms/' + code).get();
+  if (!snap.exists()) { log('Room introuvable ! Vérifie le code.'); return; }
+  myRole = 'player';
+  myRoom = code;
+  roomRef = db.ref('rooms/' + myRoom);
+  await roomRef.child('players/' + myUid).set({ name: myName, role: 'player', score: 0, blocked: false, buzzed: false });
+  roomRef.child('players/' + myUid).onDisconnect().remove();
+  document.getElementById('waiting-room-code').textContent = myRoom;
+  document.getElementById('player-room-label').textContent = 'Room ' + myRoom;
+  listenRoomPlayer();
+  show('waiting');
+}
+
+function listenRoomMJ() {
+  roomRef.child('players').on('value', snap => {
+    const players = snap.val() || {};
+    renderPlayersMJ(players);
+    renderWaiting(players);
+  });
+  roomRef.child('buzzedBy').on('value', snap => {
+    if (snap.val()) pauseAudio();
+  });
+}
+
+function renderPlayersMJ(players) {
+  const grid = document.getElementById('players-grid');
+  const entries = Object.entries(players).filter(([, p]) => p.role !== 'mj');
+  if (!entries.length) {
+    grid.innerHTML = '<div style="color:#4a4060;font-size:13px;padding:8px;">En attente de joueurs...</div>';
+    return;
+  }
+  grid.innerHTML = entries.map(([uid, p]) => {
+    const initials = p.name.substring(0, 2).toUpperCase();
+    return `
+      <div class="player-card ${p.buzzed ? 'buzzed' : ''} ${p.blocked && !p.buzzed ? 'blocked' : ''}">
+        ${p.buzzed ? '<div class="buzz-badge">BUZZ !</div>' : ''}
+        <div class="player-avatar">${initials}</div>
+        <div class="player-name">${p.name}</div>
+        <div class="player-score">${p.score || 0} pt</div>
+        <div class="score-btns">
+          <button class="score-btn good" onclick="addScore('${uid}', 1)">+1</button>
+          <button class="score-btn good" onclick="addScore('${uid}', 2)">+2</button>
+          <button class="score-btn" onclick="addScore('${uid}', -1)">-1</button>
+        </div>
+        ${p.buzzed ? `<button class="btn-unblock" onclick="blockPlayer('${uid}')">🔒 Bloquer & continuer</button>` : ''}
+        ${p.blocked && !p.buzzed ? `<button class="btn-unblock" onclick="unblockPlayer('${uid}')">🔓 Débloquer</button>` : ''}
+      </div>`;
+  }).join('');
+}
+
+function renderWaiting(players) {
+  const list = document.getElementById('waiting-players');
+  if (!list) return;
+  const joueurs = Object.values(players).filter(p => p.role !== 'mj');
+  list.innerHTML = joueurs.map(p =>
+    `<div class="waiting-player"><div class="dot"></div><div class="waiting-name">${p.name}</div></div>`
+  ).join('') || '<div class="waiting-hint">Personne encore connecté</div>';
+}
+
+function listenRoomPlayer() {
+  roomRef.child('players/' + myUid).on('value', snap => {
+    const me = snap.val();
+    if (!me) return;
+    document.getElementById('my-score-display').textContent = me.score || 0;
+    updateBuzzBtn(me);
+  });
+  roomRef.child('players').on('value', snap => {
+    renderWaiting(snap.val() || {});
+  });
+  roomRef.child('state').on('value', snap => {
+    const state = snap.val();
+    if (state === 'playing') show('player');
+    else if (state === 'waiting') show('waiting');
+  });
+}
+
+function updateBuzzBtn(me) {
+  const btn = document.getElementById('buzz-btn');
+  const status = document.getElementById('player-status');
+  if (!btn) return;
+  btn.className = 'buzz-btn';
+  if (me.buzzed) {
+    btn.classList.add('buzzed-state');
+    btn.innerHTML = '<div class="buzz-icon">✅</div><div class="buzz-label">Tu as buzzé !</div>';
+    if (status) status.textContent = 'En attente de la décision du MJ...';
+  } else if (me.blocked) {
+    btn.classList.add('blocked');
+    btn.innerHTML = '<div class="buzz-icon">🔒</div><div class="buzz-label">Bloqué</div>';
+    if (status) status.textContent = 'Ta réponse était incorrecte. Écoute la suite...';
+  } else {
+    btn.classList.add('ready');
+    btn.innerHTML = '<div class="buzz-icon">🔔</div><div class="buzz-label">BUZZER !</div>';
+    if (status) status.textContent = 'Écoute la musique et buzze en premier !';
+  }
+}
+
+async function buzz() {
+  const snap = await roomRef.child('players/' + myUid).get();
+  const me = snap.val();
+  if (!me || me.blocked || me.buzzed) return;
+  const now = Date.now();
+  await roomRef.child('players/' + myUid).update({ buzzed: true, buzzTime: now });
+  const buzzSnap = await roomRef.child('buzzedBy').get();
+  if (!buzzSnap.val()) await roomRef.child('buzzedBy').set(myUid);
+}
+
+async function addScore(uid, pts) {
+  const snap = await roomRef.child('players/' + uid).get();
+  const p = snap.val();
+  const newScore = Math.max(0, (p.score || 0) + pts);
+  await roomRef.child('players/' + uid).update({ score: newScore, buzzed: false, blocked: false });
+  await roomRef.child('buzzedBy').set(null);
+  resumeAudio();
+}
+
+async function blockPlayer(uid) {
+  await roomRef.child('players/' + uid).update({ buzzed: false, blocked: true });
+  await roomRef.child('buzzedBy').set(null);
+  resumeAudio();
+}
+
+async function unblockPlayer(uid) {
+  await roomRef.child('players/' + uid).update({ blocked: false, buzzed: false });
+}
+
+async function unblockAll() {
+  const snap = await roomRef.child('players').get();
+  const players = snap.val() || {};
+  const updates = {};
+  Object.entries(players).forEach(([uid, p]) => {
+    if (p.role !== 'mj') {
+      updates[uid + '/blocked'] = false;
+      updates[uid + '/buzzed'] = false;
+    }
+  });
+  await roomRef.child('players').update(updates);
+  await roomRef.child('buzzedBy').set(null);
+}
+
+async function resetScores() {
+  if (!confirm('Remettre tous les scores à zéro ?')) return;
+  const snap = await roomRef.child('players').get();
+  const updates = {};
+  Object.keys(snap.val() || {}).forEach(uid => { updates[uid + '/score'] = 0; });
+  await roomRef.child('players').update(updates);
+}
+
+function switchTab(tab, el) {
+  currentTab = tab;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('tab-' + tab).classList.add('active');
+}
+
+function loadFiles(files) {
+  audioFiles = Array.from(files);
+  const list = document.getElementById('file-list');
+  list.innerHTML = audioFiles.map((f, i) =>
+    `<div class="file-item" id="fi-${i}" onclick="playTrack(${i})">
+      <span class="file-item-name">🎵 ${f.name.replace(/\.[^.]+$/, '')}</span>
+    </div>`
+  ).join('');
+}
+
+async function playTrack(i) {
+  currentTrack = i;
+  const audio = document.getElementById('audio-player');
+  audio.src = URL.createObjectURL(audioFiles[i]);
+  await audio.play();
+  isPlaying = true;
+  document.getElementById('play-btn').textContent = '⏸ Pause';
+  document.getElementById('now-playing-name').textContent = audioFiles[i].name.replace(/\.[^.]+$/, '');
+  document.querySelectorAll('.file-item').forEach((el, j) => el.classList.toggle('current', j === i));
+  await roomRef.child('state').set('playing');
+  await unblockAll();
+}
+
+async function togglePlay() {
+  if (currentTab === 'youtube') { toggleYT(); return; }
+  const audio = document.getElementById('audio-player');
+  if (isPlaying) {
+    audio.pause(); isPlaying = false;
+    document.getElementById('play-btn').textContent = '▶ Lire';
+  } else {
+    if (currentTrack === -1 && audioFiles.length > 0) { playTrack(0); return; }
+    if (audio.src) {
+      await audio.play(); isPlaying = true;
+      document.getElementById('play-btn').textContent = '⏸ Pause';
+      await roomRef.child('state').set('playing');
+    }
+  }
+}
+
+function pauseAudio() {
+  const a = document.getElementById('audio-player');
+  if (isPlaying) { a.pause(); isPlaying = false; document.getElementById('play-btn').textContent = '▶ Lire'; }
+  if (ytPlayer && ytLoaded) try { ytPlayer.pauseVideo(); } catch(e) {}
+}
+
+function resumeAudio() {
+  if (currentTab === 'mp3') {
+    const a = document.getElementById('audio-player');
+    if (a.src) { a.play(); isPlaying = true; document.getElementById('play-btn').textContent = '⏸ Pause'; }
+  } else if (currentTab === 'youtube') {
+    if (ytPlayer && ytLoaded) try { ytPlayer.playVideo(); document.getElementById('play-btn').textContent = '⏸ Pause'; } catch(e) {}
+  }
+}
+
+async function stopMusic() {
+  const a = document.getElementById('audio-player');
+  a.pause(); a.currentTime = 0; isPlaying = false;
+  document.getElementById('play-btn').textContent = '▶ Lire';
+  if (ytPlayer && ytLoaded) try { ytPlayer.stopVideo(); } catch(e) {}
+  await roomRef.child('state').set('waiting');
+  await roomRef.child('buzzedBy').set(null);
+}
+
+async function nextTrack() {
+  if (currentTab === 'mp3' && audioFiles.length > 0) {
+    await playTrack((currentTrack + 1) % audioFiles.length);
+  }
+}
+
+function loadYoutube() {
+  const url = document.getElementById('yt-url').value.trim();
+  if (!url) return;
+  const match = url.match(/(?:v=|youtu\.be\/)([^&?\/]+)/);
+  if (!match) { alert('URL YouTube invalide'); return; }
+  const videoId = match[1];
+  document.getElementById('now-playing-name').textContent = 'YouTube (chargement...)';
+  if (!ytLoaded) {
+    window.onYouTubeIframeAPIReady = () => {
+      ytPlayer = new YT.Player('yt-player', {
+        height: '1', width: '1', videoId,
+        playerVars: { autoplay: 0 },
+        events: { onReady: () => { ytLoaded = true; document.getElementById('now-playing-name').textContent = 'YouTube prêt'; } }
+      });
+    };
+    const s = document.createElement('script');
+    s.src = 'https://www.youtube.com/iframe_api';
+    document.head.appendChild(s);
+  } else {
+    ytPlayer.loadVideoById(videoId);
+    document.getElementById('now-playing-name').textContent = 'YouTube: ' + videoId;
+  }
+}
+
+function toggleYT() {
+  if (!ytPlayer || !ytLoaded) return;
+  try {
+    const state = ytPlayer.getPlayerState();
+    if (state === 1) {
+      ytPlayer.pauseVideo();
+      document.getElementById('play-btn').textContent = '▶ Lire';
+    } else {
+      ytPlayer.playVideo();
+      document.getElementById('play-btn').textContent = '⏸ Pause';
+      roomRef.child('state').set('playing');
+      unblockAll();
+    }
+  } catch(e) {}
+}
+
+const fileDrop = document.getElementById('file-drop');
+if (fileDrop) {
+  fileDrop.addEventListener('dragover', e => { e.preventDefault(); fileDrop.style.borderColor = '#a78bfa'; });
+  fileDrop.addEventListener('dragleave', () => { fileDrop.style.borderColor = '#2a2440'; });
+  fileDrop.addEventListener('drop', e => {
+    e.preventDefault();
+    fileDrop.style.borderColor = '#2a2440';
+    loadFiles(e.dataTransfer.files);
+  });
+}
+</script>
+</body>
+</html>
