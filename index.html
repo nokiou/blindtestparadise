@@ -25,13 +25,21 @@
   .btn-secondary:hover { background: #1a1630; }
   .divider { text-align: center; color: #4a4060; font-size: 13px; margin: 16px 0; }
 
-  .header { width: 100%; max-width: 700px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+  /* MJ layout */
+  .header { width: 100%; max-width: 760px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
   .room-code { background: #1a1630; border: 1px solid #2a2440; border-radius: 10px; padding: 8px 16px; font-size: 13px; color: #7c6fa0; }
   .room-code span { color: #a78bfa; font-weight: 700; font-size: 18px; letter-spacing: 3px; }
-  .players-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; width: 100%; max-width: 700px; margin-bottom: 24px; }
+
+  /* Mode toggle */
+  .mode-toggle { display: flex; border: 1px solid #2a2440; border-radius: 10px; overflow: hidden; }
+  .mode-btn { padding: 8px 14px; border: none; background: transparent; color: #7c6fa0; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
+  .mode-btn.active { background: #1a1630; color: #a78bfa; }
+
+  /* Players grid */
+  .players-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; width: 100%; max-width: 760px; margin-bottom: 16px; }
   .player-card { background: #13111f; border: 1px solid #2a2440; border-radius: 14px; padding: 16px; text-align: center; position: relative; transition: border 0.2s; }
   .player-card.buzzed { border-color: #f472b6; animation: pulse-pink 0.6s ease; }
-  .player-card.blocked { opacity: 0.5; }
+  .player-card.blocked { opacity: 0.45; }
   .player-avatar { width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg, #7c3aed, #db2777); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 18px; margin: 0 auto 8px; }
   .player-name { font-size: 13px; font-weight: 600; color: #f0eeff; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .player-score { font-size: 22px; font-weight: 700; color: #a78bfa; }
@@ -41,8 +49,24 @@
   .score-btn:hover { background: #1a1630; }
   .score-btn.good { border-color: #10b981; color: #10b981; }
   .score-btn.good:hover { background: #0d2e22; }
+  .btn-unblock { margin-top: 6px; padding: 5px 10px; border-radius: 6px; border: 1px solid #7c6fa0; background: transparent; color: #7c6fa0; font-size: 12px; cursor: pointer; width: 100%; }
+  .btn-unblock:hover { background: #1a1630; }
 
-  .audio-panel { background: #13111f; border: 1px solid #2a2440; border-radius: 20px; padding: 24px; width: 100%; max-width: 700px; margin-bottom: 20px; }
+  /* Queue panel */
+  .queue-panel { width: 100%; max-width: 760px; background: #13111f; border: 1px solid #f472b6; border-radius: 16px; padding: 20px; margin-bottom: 16px; }
+  .queue-panel h3 { font-size: 13px; color: #f472b6; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 14px; }
+  .queue-item { display: flex; align-items: center; gap: 12px; padding: 12px 14px; background: #0a0a12; border-radius: 10px; margin-bottom: 8px; border: 1px solid #2a2440; animation: fadeIn 0.3s ease; }
+  .queue-rank { font-size: 20px; width: 28px; text-align: center; flex-shrink: 0; }
+  .queue-name { font-size: 14px; font-weight: 600; color: #f0eeff; flex: 1; }
+  .queue-delay { font-size: 12px; color: #7c6fa0; background: #1a1630; border-radius: 6px; padding: 3px 8px; white-space: nowrap; }
+  .queue-score-btns { display: flex; gap: 4px; flex-shrink: 0; }
+  .queue-score-btn { padding: 5px 10px; border-radius: 6px; border: 1px solid #2a2440; background: transparent; color: #a78bfa; cursor: pointer; font-size: 13px; font-weight: 600; transition: background 0.15s; }
+  .queue-score-btn:hover { background: #1a1630; }
+  .queue-score-btn.good { border-color: #10b981; color: #10b981; }
+  .queue-score-btn.good:hover { background: #0d2e22; }
+
+  /* Audio panel */
+  .audio-panel { background: #13111f; border: 1px solid #2a2440; border-radius: 20px; padding: 24px; width: 100%; max-width: 760px; margin-bottom: 16px; }
   .audio-panel h3 { font-size: 13px; color: #7c6fa0; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px; }
   .tabs { display: flex; gap: 8px; margin-bottom: 16px; }
   .tab { padding: 7px 16px; border-radius: 8px; border: 1px solid #2a2440; background: transparent; color: #7c6fa0; cursor: pointer; font-size: 13px; transition: all 0.15s; }
@@ -68,50 +92,49 @@
   .file-item.current { background: #1a1630; border: 1px solid #a78bfa; }
   .file-item-name { font-size: 13px; color: #f0eeff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
 
+  /* Player buzz screen */
   .buzz-container { display: flex; flex-direction: column; align-items: center; gap: 32px; }
-  .buzz-btn { width: 220px; height: 220px; border-radius: 50%; border: none; cursor: pointer; font-size: 24px; font-weight: 800; transition: all 0.1s; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 4px; }
+  .buzz-btn { width: 220px; height: 220px; border-radius: 50%; border: none; cursor: pointer; font-weight: 800; transition: all 0.1s; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 4px; }
   .buzz-btn.ready { background: radial-gradient(circle at 35% 35%, #f472b6, #7c3aed); box-shadow: 0 0 60px rgba(167,139,250,0.4), 0 0 120px rgba(244,114,182,0.2); }
   .buzz-btn.ready:active { transform: scale(0.93); }
   .buzz-btn.blocked { background: #1a1630; box-shadow: none; color: #4a4060; cursor: not-allowed; }
   .buzz-btn.buzzed-state { background: radial-gradient(circle at 35% 35%, #10b981, #065f46); box-shadow: 0 0 60px rgba(16,185,129,0.4); cursor: not-allowed; }
   .buzz-icon { font-size: 52px; line-height: 1; }
   .buzz-label { font-size: 16px; font-weight: 600; color: rgba(255,255,255,0.8); }
-  .status-msg { font-size: 15px; color: #7c6fa0; text-align: center; }
+  .status-msg { font-size: 15px; color: #7c6fa0; text-align: center; padding: 0 20px; }
   .my-score-display { background: #13111f; border: 1px solid #2a2440; border-radius: 16px; padding: 20px 40px; text-align: center; }
   .my-score-display .label { font-size: 12px; color: #7c6fa0; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 4px; }
   .my-score-display .value { font-size: 48px; font-weight: 700; color: #a78bfa; }
 
+  /* Waiting screen */
   .waiting-list { width: 100%; max-width: 380px; margin-top: 24px; }
   .waiting-player { display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: #13111f; border: 1px solid #2a2440; border-radius: 10px; margin-bottom: 8px; animation: fadeIn 0.3s ease; }
   .dot { width: 8px; height: 8px; border-radius: 50%; background: #10b981; }
   .waiting-name { font-size: 14px; color: #f0eeff; }
   .waiting-hint { color: #4a4060; font-size: 13px; text-align: center; margin-top: 8px; }
 
+  .section-title { width: 100%; max-width: 760px; font-size: 13px; color: #7c6fa0; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+  .action-row { display: flex; gap: 10px; width: 100%; max-width: 760px; margin-bottom: 24px; flex-wrap: wrap; }
+  .action-row .btn { width: auto; flex: 1; min-width: 130px; }
+  .log { font-size: 12px; color: #f472b6; margin-top: 10px; text-align: center; min-height: 18px; }
+  #yt-iframe-container { position: absolute; width: 1px; height: 1px; overflow: hidden; left: -9999px; }
+
   @keyframes pulse-pink { 0%,100% { box-shadow: 0 0 0 0 rgba(244,114,182,0); } 50% { box-shadow: 0 0 0 12px rgba(244,114,182,0.3); } }
   @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
-
-  .log { font-size: 12px; color: #f472b6; margin-top: 10px; text-align: center; min-height: 18px; }
-  .btn-unblock { margin-top: 6px; padding: 5px 10px; border-radius: 6px; border: 1px solid #7c6fa0; background: transparent; color: #7c6fa0; font-size: 12px; cursor: pointer; width: 100%; }
-  .btn-unblock:hover { background: #1a1630; }
-  .section-title { width: 100%; max-width: 700px; font-size: 13px; color: #7c6fa0; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
-  .action-row { display: flex; gap: 10px; width: 100%; max-width: 700px; margin-bottom: 16px; flex-wrap: wrap; }
-  .action-row .btn { width: auto; flex: 1; min-width: 160px; }
-  #yt-iframe-container { position: absolute; width: 1px; height: 1px; overflow: hidden; left: -9999px; }
 </style>
 </head>
 <body>
 
-<!-- ACCUEIL -->
+<!-- ═══ ACCUEIL ═══ -->
 <div id="screen-home" class="screen active">
   <div class="logo">🎵 Blind Test</div>
   <div class="tagline">Paradis</div>
 
-  <!-- Bandeau de reprise de session MJ (caché par défaut) -->
   <div id="resume-banner" style="display:none;width:100%;max-width:380px;margin-bottom:16px;background:#1a1630;border:1px solid #a78bfa;border-radius:14px;padding:18px 20px;">
     <div style="font-size:13px;color:#a78bfa;font-weight:600;margin-bottom:4px;">⚡ Session en cours</div>
-    <div style="font-size:14px;color:#f0eeff;margin-bottom:12px;" id="resume-label">Room <strong></strong> — reprendre en tant que MJ ?</div>
+    <div style="font-size:14px;color:#f0eeff;margin-bottom:12px;" id="resume-label">Room <strong></strong></div>
     <div style="display:flex;gap:8px;">
-      <button class="btn btn-primary" style="flex:1;padding:10px;" onclick="resumeSession()">Reprendre la room</button>
+      <button class="btn btn-primary" style="flex:1;padding:10px;" onclick="resumeSession()">Reprendre</button>
       <button class="btn btn-secondary" style="flex:1;padding:10px;margin:0;" onclick="clearSession()">Nouvelle partie</button>
     </div>
   </div>
@@ -128,13 +151,19 @@
   </div>
 </div>
 
-<!-- ECRAN MJ -->
-<div id="screen-mj" class="screen" style="justify-content:flex-start; padding-top:32px;">
+<!-- ═══ ECRAN MJ ═══ -->
+<div id="screen-mj" class="screen" style="justify-content:flex-start; padding-top:28px;">
+
   <div class="header">
     <div style="font-size:18px;font-weight:700;color:#a78bfa;">🎛 Maître du Jeu</div>
     <div class="room-code">Room : <span id="display-code">----</span></div>
+    <div class="mode-toggle">
+      <button class="mode-btn active" id="mode-btn-classic" onclick="setMode('classic')">⚡ Classique</button>
+      <button class="mode-btn" id="mode-btn-queue" onclick="setMode('queue')">📋 File d'attente</button>
+    </div>
   </div>
 
+  <!-- Audio -->
   <div class="audio-panel">
     <h3>🎵 Source musicale</h3>
     <div class="tabs">
@@ -165,11 +194,19 @@
     </div>
   </div>
 
+  <!-- File d'attente (mode queue uniquement) -->
+  <div class="queue-panel" id="queue-panel" style="display:none;">
+    <h3>📋 File d'attente des buzzers</h3>
+    <div id="queue-list"><div style="color:#4a4060;font-size:13px;">En attente de buzzers...</div></div>
+  </div>
+
+  <!-- Joueurs -->
   <div class="section-title">Joueurs connectés</div>
   <div class="players-grid" id="players-grid"></div>
 
   <div class="action-row">
-    <button class="btn btn-secondary" onclick="unblockAll()">🔓 Débloquer tous les buzzers</button>
+    <button class="btn btn-secondary" onclick="unblockAll()">🔓 Débloquer tous</button>
+    <button class="btn btn-secondary" onclick="clearQueue()" id="btn-clear-queue" style="display:none;">🗑 Vider la file</button>
     <button class="btn btn-secondary" onclick="resetScores()" style="color:#f472b6;border-color:#3a1a2a;">🔄 Reset scores</button>
     <button class="btn btn-secondary" onclick="endSession()" style="color:#7c6fa0;border-color:#2a2440;">🚪 Terminer</button>
   </div>
@@ -178,9 +215,9 @@
   <audio id="audio-player"></audio>
 </div>
 
-<!-- ATTENTE JOUEUR -->
+<!-- ═══ ATTENTE JOUEUR ═══ -->
 <div id="screen-waiting" class="screen">
-  <div id="connection-banner" style="display:none;position:fixed;top:0;left:0;right:0;background:#7c3aed;color:white;padding:10px;text-align:center;font-size:13px;font-weight:600;align-items:center;justify-content:center;gap:8px;z-index:999;">
+  <div id="connection-banner" style="display:none;position:fixed;top:0;left:0;right:0;background:#7c3aed;color:white;padding:10px;text-align:center;font-size:13px;font-weight:600;z-index:999;">
     ⏳ Reconnexion en cours...
   </div>
   <div class="logo" style="font-size:32px;">🎵 Blind Test</div>
@@ -191,7 +228,7 @@
   <div class="waiting-hint">La partie commencera quand le MJ lancera la musique</div>
 </div>
 
-<!-- ECRAN JOUEUR EN JEU -->
+<!-- ═══ ECRAN JOUEUR EN JEU ═══ -->
 <div id="screen-player" class="screen">
   <div id="connection-banner-play" style="display:none;position:fixed;top:0;left:0;right:0;background:#7c3aed;color:white;padding:10px;text-align:center;font-size:13px;font-weight:600;z-index:999;">
     ⏳ Reconnexion en cours...
@@ -210,6 +247,7 @@
   </div>
 </div>
 
+<!-- ═══ SCRIPTS ═══ -->
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
@@ -233,89 +271,76 @@ let myUid = null, myName = '', myRole = '', myRoom = '', roomRef = null;
 let audioFiles = [], currentTrack = -1, isPlaying = false;
 let ytPlayer = null, ytLoaded = false, currentTab = 'mp3';
 let myLastScore = 0;
+let gameMode = 'classic'; // 'classic' | 'queue'
 
+// ── Utils ──────────────────────────────────────────────
 function show(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-' + id).classList.add('active');
 }
-
-function log(msg) {
-  document.getElementById('home-log').textContent = msg;
+function log(msg) { document.getElementById('home-log').textContent = msg; }
+function genCode() { return Math.random().toString(36).substring(2, 6).toUpperCase(); }
+function fmtDelay(ms) {
+  if (!ms || ms <= 0) return '?';
+  return (ms / 1000).toFixed(2) + 's';
 }
 
-function genCode() {
-  return Math.random().toString(36).substring(2, 6).toUpperCase();
-}
-
+// ── Auth ───────────────────────────────────────────────
 auth.signInAnonymously().then(r => {
   myUid = r.user.uid;
-}).catch(e => log('Erreur connexion Firebase : ' + e.message));
+}).catch(e => log('Erreur Firebase : ' + e.message));
 
-// Reconnexion automatique après veille
+// ── Reconnexion automatique après veille (joueurs) ─────
 db.ref('.info/connected').on('value', async snap => {
+  // Mise à jour bannière connexion
+  const b1 = document.getElementById('connection-banner');
+  const b2 = document.getElementById('connection-banner-play');
+  const display = snap.val() ? 'none' : 'block';
+  if (b1) b1.style.display = display;
+  if (b2) b2.style.display = display;
+
   if (!snap.val() || !roomRef || myRole !== 'player') return;
-  // On est reconnecté — on se réenregistre si nécessaire
   const playerSnap = await roomRef.child('players/' + myUid).get();
   if (!playerSnap.exists() && myName) {
-    await roomRef.child('players/' + myUid).set({ name: myName, role: 'player', score: myLastScore, blocked: false, buzzed: false });
+    await roomRef.child('players/' + myUid).set({ name: myName, role: 'player', score: myLastScore, blocked: false, buzzed: false, online: true });
   } else if (playerSnap.exists()) {
     await roomRef.child('players/' + myUid).update({ online: true });
   }
-  // Marquer hors ligne à la prochaine déconnexion (sans supprimer)
   roomRef.child('players/' + myUid).onDisconnect().update({ online: false, buzzed: false });
 });
 
+// ── Mode de jeu ────────────────────────────────────────
+function setMode(mode) {
+  gameMode = mode;
+  document.getElementById('mode-btn-classic').classList.toggle('active', mode === 'classic');
+  document.getElementById('mode-btn-queue').classList.toggle('active', mode === 'queue');
+  document.getElementById('queue-panel').style.display = mode === 'queue' ? 'block' : 'none';
+  document.getElementById('btn-clear-queue').style.display = mode === 'queue' ? 'inline-block' : 'none';
+  if (roomRef) roomRef.update({ mode });
+}
+
+// ── Création room (MJ) ─────────────────────────────────
 async function createRoom() {
   myName = document.getElementById('mj-name').value.trim();
   if (!myName) { log('Entre ton prénom !'); return; }
-  if (!myUid) { log('Connexion Firebase en cours, réessaie...'); return; }
+  if (!myUid) { log('Connexion en cours, réessaie...'); return; }
   myRole = 'mj';
   myRoom = genCode();
   document.getElementById('display-code').textContent = myRoom;
   roomRef = db.ref('rooms/' + myRoom);
-  await roomRef.set({ created: Date.now(), state: 'waiting', buzzedBy: null });
+  await roomRef.set({ created: Date.now(), state: 'waiting', buzzedBy: null, mode: 'classic', musicStartTime: 0 });
   await roomRef.child('players/' + myUid).set({ name: myName, role: 'mj', score: 0, blocked: false, buzzed: false });
   localStorage.setItem('bt_mj_session', JSON.stringify({ room: myRoom, name: myName }));
   listenRoomMJ();
   show('mj');
 }
 
-async function resumeSession() {
-  const saved = JSON.parse(localStorage.getItem('bt_mj_session') || 'null');
-  if (!saved) return;
-  if (!myUid) { log('Connexion Firebase en cours, réessaie...'); return; }
-  const snap = await db.ref('rooms/' + saved.room).get();
-  if (!snap.exists()) { log('La room a expiré, crée-en une nouvelle.'); clearSession(); return; }
-  myRole = 'mj';
-  myName = saved.name;
-  myRoom = saved.room;
-  roomRef = db.ref('rooms/' + myRoom);
-  document.getElementById('display-code').textContent = myRoom;
-  await roomRef.child('players/' + myUid).set({ name: myName, role: 'mj', score: 0, blocked: false, buzzed: false });
-  listenRoomMJ();
-  show('mj');
-}
-
-function clearSession() {
-  localStorage.removeItem('bt_mj_session');
-  document.getElementById('resume-banner').style.display = 'none';
-}
-
-// Vérifie une session MJ sauvegardée au chargement
-window.addEventListener('load', () => {
-  const saved = JSON.parse(localStorage.getItem('bt_mj_session') || 'null');
-  if (saved) {
-    const banner = document.getElementById('resume-banner');
-    banner.style.display = 'block';
-    banner.querySelector('#resume-label').innerHTML = `Room <strong style="color:#a78bfa;letter-spacing:2px">${saved.room}</strong> — reprendre en tant que MJ ?`;
-  }
-});
-
+// ── Rejoindre room (joueur) ────────────────────────────
 async function joinRoom() {
   myName = document.getElementById('player-name').value.trim();
   const code = document.getElementById('room-code-join').value.trim().toUpperCase();
   if (!myName || !code) { log('Remplis les deux champs !'); return; }
-  if (!myUid) { log('Connexion Firebase en cours, réessaie...'); return; }
+  if (!myUid) { log('Connexion en cours, réessaie...'); return; }
   const snap = await db.ref('rooms/' + code).get();
   if (!snap.exists()) { log('Room introuvable ! Vérifie le code.'); return; }
   myRole = 'player';
@@ -329,14 +354,43 @@ async function joinRoom() {
   show('waiting');
 }
 
+// ── Reprise session MJ ─────────────────────────────────
+async function resumeSession() {
+  const saved = JSON.parse(localStorage.getItem('bt_mj_session') || 'null');
+  if (!saved) return;
+  if (!myUid) { log('Connexion en cours, réessaie...'); return; }
+  const snap = await db.ref('rooms/' + saved.room).get();
+  if (!snap.exists()) { log('La room a expiré, crée-en une nouvelle.'); clearSession(); return; }
+  myRole = 'mj'; myName = saved.name; myRoom = saved.room;
+  roomRef = db.ref('rooms/' + myRoom);
+  document.getElementById('display-code').textContent = myRoom;
+  await roomRef.child('players/' + myUid).set({ name: myName, role: 'mj', score: 0, blocked: false, buzzed: false });
+  const roomData = snap.val();
+  if (roomData.mode) { gameMode = roomData.mode; setMode(gameMode); }
+  listenRoomMJ();
+  show('mj');
+}
+
+function clearSession() {
+  localStorage.removeItem('bt_mj_session');
+  document.getElementById('resume-banner').style.display = 'none';
+}
+
+// ── Listeners MJ ──────────────────────────────────────
 function listenRoomMJ() {
   roomRef.child('players').on('value', snap => {
     const players = snap.val() || {};
     renderPlayersMJ(players);
     renderWaiting(players);
   });
+  roomRef.child('buzzerQueue').on('value', snap => {
+    renderQueue(snap.val());
+  });
   roomRef.child('buzzedBy').on('value', snap => {
     if (snap.val()) pauseAudio();
+  });
+  roomRef.child('mode').on('value', snap => {
+    if (snap.val() && snap.val() !== gameMode) { gameMode = snap.val(); setMode(gameMode); }
   });
 }
 
@@ -349,11 +403,11 @@ function renderPlayersMJ(players) {
   }
   grid.innerHTML = entries.map(([uid, p]) => {
     const initials = p.name.substring(0, 2).toUpperCase();
-    const offlineBadge = p.online === false ? '<div style="position:absolute;top:-8px;left:-8px;background:#4a4060;border-radius:20px;padding:3px 8px;font-size:11px;color:#aaa;">hors ligne</div>' : '';
+    const offline = p.online === false;
     return `
-      <div class="player-card ${p.buzzed ? 'buzzed' : ''} ${p.blocked && !p.buzzed ? 'blocked' : ''}" style="${p.online === false ? 'opacity:0.4;' : ''}">
+      <div class="player-card ${p.buzzed ? 'buzzed' : ''} ${p.blocked && !p.buzzed ? 'blocked' : ''}" style="${offline ? 'opacity:0.35;' : ''}">
         ${p.buzzed ? '<div class="buzz-badge">BUZZ !</div>' : ''}
-        ${offlineBadge}
+        ${offline ? '<div style="position:absolute;top:-8px;left:-8px;background:#2a2440;border-radius:20px;padding:3px 8px;font-size:10px;color:#7c6fa0;">hors ligne</div>' : ''}
         <div class="player-avatar">${initials}</div>
         <div class="player-name">${p.name}</div>
         <div class="player-score">${p.score || 0} pt</div>
@@ -362,10 +416,72 @@ function renderPlayersMJ(players) {
           <button class="score-btn good" onclick="addScore('${uid}', 2)">+2</button>
           <button class="score-btn" onclick="addScore('${uid}', -1)">-1</button>
         </div>
-        ${p.buzzed ? `<button class="btn-unblock" onclick="blockPlayer('${uid}')">🔒 Bloquer & continuer</button>` : ''}
+        ${p.buzzed && gameMode === 'classic' ? `<button class="btn-unblock" onclick="blockPlayer('${uid}')">🔒 Bloquer & continuer</button>` : ''}
         ${p.blocked && !p.buzzed ? `<button class="btn-unblock" onclick="unblockPlayer('${uid}')">🔓 Débloquer</button>` : ''}
       </div>`;
   }).join('');
+}
+
+// ── File d'attente ─────────────────────────────────────
+function renderQueue(queue) {
+  const el = document.getElementById('queue-list');
+  if (!queue || !Object.keys(queue).length) {
+    el.innerHTML = '<div style="color:#4a4060;font-size:13px;">En attente de buzzers...</div>';
+    return;
+  }
+  const sorted = Object.entries(queue).sort((a, b) => a[1].order - b[1].order);
+  const medals = ['🥇', '🥈', '🥉'];
+  el.innerHTML = sorted.map(([uid, q], i) => `
+    <div class="queue-item">
+      <div class="queue-rank">${medals[i] || (i + 1) + '.'}</div>
+      <div class="queue-name">${q.name}</div>
+      <div class="queue-delay">+${fmtDelay(q.delay)}</div>
+      <div class="queue-score-btns">
+        <button class="queue-score-btn good" onclick="addScoreQueue('${uid}', 1)">+1</button>
+        <button class="queue-score-btn good" onclick="addScoreQueue('${uid}', 2)">+2</button>
+        <button class="queue-score-btn" onclick="addScoreQueue('${uid}', -1)">-1</button>
+      </div>
+    </div>`
+  ).join('');
+}
+
+async function addScoreQueue(uid, pts) {
+  const snap = await roomRef.child('players/' + uid).get();
+  const p = snap.val();
+  const newScore = Math.max(0, (p.score || 0) + pts);
+  await roomRef.child('players/' + uid).update({ score: newScore });
+}
+
+async function clearQueue() {
+  await roomRef.child('buzzerQueue').remove();
+  await roomRef.child('buzzedBy').set(null);
+  // Réinitialise l'état buzzed de tous les joueurs
+  const snap = await roomRef.child('players').get();
+  const players = snap.val() || {};
+  const updates = {};
+  Object.entries(players).forEach(([uid, p]) => {
+    if (p.role !== 'mj') updates[uid + '/buzzed'] = false;
+  });
+  await roomRef.child('players').update(updates);
+  resumeAudio();
+}
+
+// ── Listeners Joueur ───────────────────────────────────
+function listenRoomPlayer() {
+  roomRef.child('players/' + myUid).on('value', snap => {
+    const me = snap.val();
+    if (!me) return;
+    myLastScore = me.score || 0;
+    document.getElementById('my-score-display').textContent = myLastScore;
+    updateBuzzBtn(me);
+  });
+  roomRef.child('players').on('value', snap => { renderWaiting(snap.val() || {}); });
+  roomRef.child('state').on('value', snap => {
+    const state = snap.val();
+    if (state === 'playing') show('player');
+    else if (state === 'waiting') show('waiting');
+  });
+  roomRef.child('mode').on('value', snap => { if (snap.val()) gameMode = snap.val(); });
 }
 
 function renderWaiting(players) {
@@ -377,32 +493,6 @@ function renderWaiting(players) {
   ).join('') || '<div class="waiting-hint">Personne encore connecté</div>';
 }
 
-function listenRoomPlayer() {
-  roomRef.child('players/' + myUid).on('value', snap => {
-    const me = snap.val();
-    if (!me) return;
-    myLastScore = me.score || 0;
-    document.getElementById('my-score-display').textContent = myLastScore;
-    updateBuzzBtn(me);
-  });
-  roomRef.child('players').on('value', snap => {
-    renderWaiting(snap.val() || {});
-  });
-  roomRef.child('state').on('value', snap => {
-    const state = snap.val();
-    if (state === 'playing') show('player');
-    else if (state === 'waiting') show('waiting');
-  });
-  // Indicateur connexion temps réel
-  db.ref('.info/connected').on('value', snap => {
-    const banner = document.getElementById('connection-banner');
-    const banner2 = document.getElementById('connection-banner-play');
-    const show = snap.val() ? 'none' : 'flex';
-    if (banner) banner.style.display = show;
-    if (banner2) banner2.style.display = show;
-  });
-}
-
 function updateBuzzBtn(me) {
   const btn = document.getElementById('buzz-btn');
   const status = document.getElementById('player-status');
@@ -410,8 +500,10 @@ function updateBuzzBtn(me) {
   btn.className = 'buzz-btn';
   if (me.buzzed) {
     btn.classList.add('buzzed-state');
-    btn.innerHTML = '<div class="buzz-icon">✅</div><div class="buzz-label">Tu as buzzé !</div>';
-    if (status) status.textContent = 'En attente de la décision du MJ...';
+    btn.innerHTML = '<div class="buzz-icon">✅</div><div class="buzz-label">Buzzé !</div>';
+    if (status) status.textContent = gameMode === 'queue'
+      ? 'Tu es dans la file — attends ton tour !'
+      : 'En attente de la décision du MJ...';
   } else if (me.blocked) {
     btn.classList.add('blocked');
     btn.innerHTML = '<div class="buzz-icon">🔒</div><div class="buzz-label">Bloqué</div>';
@@ -419,27 +511,51 @@ function updateBuzzBtn(me) {
   } else {
     btn.classList.add('ready');
     btn.innerHTML = '<div class="buzz-icon">🔔</div><div class="buzz-label">BUZZER !</div>';
-    if (status) status.textContent = 'Écoute la musique et buzze en premier !';
+    if (status) status.textContent = 'Écoute et buzze en premier !';
   }
 }
 
+// ── Buzz joueur ────────────────────────────────────────
 async function buzz() {
   const snap = await roomRef.child('players/' + myUid).get();
   const me = snap.val();
   if (!me || me.blocked || me.buzzed) return;
-  const now = Date.now();
-  await roomRef.child('players/' + myUid).update({ buzzed: true, buzzTime: now });
-  const buzzSnap = await roomRef.child('buzzedBy').get();
-  if (!buzzSnap.val()) await roomRef.child('buzzedBy').set(myUid);
+
+  // Délai via offset serveur Firebase
+  const offsetSnap = await db.ref('.info/serverTimeOffset').get();
+  const offset = offsetSnap.val() || 0;
+  const serverNow = Date.now() + offset;
+
+  const startSnap = await roomRef.child('musicStartTime').get();
+  const startTime = startSnap.val() || 0;
+  const delay = startTime > 0 ? Math.max(0, serverNow - startTime) : 0;
+
+  await roomRef.child('players/' + myUid).update({ buzzed: true, buzzTime: serverNow });
+
+  if (gameMode === 'queue') {
+    const queueSnap = await roomRef.child('buzzerQueue').get();
+    const queue = queueSnap.val() || {};
+    const order = Object.keys(queue).length + 1;
+    await roomRef.child('buzzerQueue/' + myUid).set({ name: me.name, delay, order });
+    // Coupe la musique uniquement au premier buzz
+    if (order === 1) await roomRef.child('buzzedBy').set(myUid);
+  } else {
+    // Mode classique : premier arrivé bloque tout
+    const buzzSnap = await roomRef.child('buzzedBy').get();
+    if (!buzzSnap.val()) await roomRef.child('buzzedBy').set(myUid);
+  }
 }
 
+// ── Actions MJ ────────────────────────────────────────
 async function addScore(uid, pts) {
   const snap = await roomRef.child('players/' + uid).get();
   const p = snap.val();
   const newScore = Math.max(0, (p.score || 0) + pts);
   await roomRef.child('players/' + uid).update({ score: newScore, buzzed: false, blocked: false });
-  await roomRef.child('buzzedBy').set(null);
-  resumeAudio();
+  if (gameMode === 'classic') {
+    await roomRef.child('buzzedBy').set(null);
+    resumeAudio();
+  }
 }
 
 async function blockPlayer(uid) {
@@ -457,10 +573,7 @@ async function unblockAll() {
   const players = snap.val() || {};
   const updates = {};
   Object.entries(players).forEach(([uid, p]) => {
-    if (p.role !== 'mj') {
-      updates[uid + '/blocked'] = false;
-      updates[uid + '/buzzed'] = false;
-    }
+    if (p.role !== 'mj') { updates[uid + '/blocked'] = false; updates[uid + '/buzzed'] = false; }
   });
   await roomRef.child('players').update(updates);
   await roomRef.child('buzzedBy').set(null);
@@ -481,6 +594,7 @@ async function endSession() {
   location.reload();
 }
 
+// ── Audio ──────────────────────────────────────────────
 function switchTab(tab, el) {
   currentTab = tab;
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -491,12 +605,15 @@ function switchTab(tab, el) {
 
 function loadFiles(files) {
   audioFiles = Array.from(files);
-  const list = document.getElementById('file-list');
-  list.innerHTML = audioFiles.map((f, i) =>
+  document.getElementById('file-list').innerHTML = audioFiles.map((f, i) =>
     `<div class="file-item" id="fi-${i}" onclick="playTrack(${i})">
       <span class="file-item-name">🎵 ${f.name.replace(/\.[^.]+$/, '')}</span>
     </div>`
   ).join('');
+}
+
+async function recordMusicStart() {
+  await roomRef.update({ musicStartTime: firebase.database.ServerValue.TIMESTAMP });
 }
 
 async function playTrack(i) {
@@ -510,6 +627,8 @@ async function playTrack(i) {
   document.querySelectorAll('.file-item').forEach((el, j) => el.classList.toggle('current', j === i));
   await roomRef.child('state').set('playing');
   await unblockAll();
+  await roomRef.child('buzzerQueue').remove();
+  await recordMusicStart();
 }
 
 async function togglePlay() {
@@ -519,11 +638,12 @@ async function togglePlay() {
     audio.pause(); isPlaying = false;
     document.getElementById('play-btn').textContent = '▶ Lire';
   } else {
-    if (currentTrack === -1 && audioFiles.length > 0) { playTrack(0); return; }
+    if (currentTrack === -1 && audioFiles.length > 0) { await playTrack(0); return; }
     if (audio.src) {
       await audio.play(); isPlaying = true;
       document.getElementById('play-btn').textContent = '⏸ Pause';
       await roomRef.child('state').set('playing');
+      await recordMusicStart();
     }
   }
 }
@@ -550,6 +670,7 @@ async function stopMusic() {
   if (ytPlayer && ytLoaded) try { ytPlayer.stopVideo(); } catch(e) {}
   await roomRef.child('state').set('waiting');
   await roomRef.child('buzzedBy').set(null);
+  await roomRef.child('buzzerQueue').remove();
 }
 
 async function nextTrack() {
@@ -582,7 +703,7 @@ function loadYoutube() {
   }
 }
 
-function toggleYT() {
+async function toggleYT() {
   if (!ytPlayer || !ytLoaded) return;
   try {
     const state = ytPlayer.getPlayerState();
@@ -592,22 +713,31 @@ function toggleYT() {
     } else {
       ytPlayer.playVideo();
       document.getElementById('play-btn').textContent = '⏸ Pause';
-      roomRef.child('state').set('playing');
-      unblockAll();
+      await roomRef.child('state').set('playing');
+      await unblockAll();
+      await roomRef.child('buzzerQueue').remove();
+      await recordMusicStart();
     }
   } catch(e) {}
 }
 
+// ── Drag & drop ────────────────────────────────────────
 const fileDrop = document.getElementById('file-drop');
 if (fileDrop) {
   fileDrop.addEventListener('dragover', e => { e.preventDefault(); fileDrop.style.borderColor = '#a78bfa'; });
   fileDrop.addEventListener('dragleave', () => { fileDrop.style.borderColor = '#2a2440'; });
-  fileDrop.addEventListener('drop', e => {
-    e.preventDefault();
-    fileDrop.style.borderColor = '#2a2440';
-    loadFiles(e.dataTransfer.files);
-  });
+  fileDrop.addEventListener('drop', e => { e.preventDefault(); fileDrop.style.borderColor = '#2a2440'; loadFiles(e.dataTransfer.files); });
 }
+
+// ── Session MJ sauvegardée ─────────────────────────────
+window.addEventListener('load', () => {
+  const saved = JSON.parse(localStorage.getItem('bt_mj_session') || 'null');
+  if (saved) {
+    document.getElementById('resume-banner').style.display = 'block';
+    document.getElementById('resume-label').innerHTML =
+      `Room <strong style="color:#a78bfa;letter-spacing:2px">${saved.room}</strong> — reprendre en tant que MJ ?`;
+  }
+});
 </script>
 </body>
 </html>
