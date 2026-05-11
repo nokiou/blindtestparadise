@@ -517,39 +517,31 @@ function updateBuzzBtn(me) {
 
 // ── Buzz joueur ────────────────────────────────────────
 async function buzz() {
-  alert('1 - uid:' + myUid + ' room:' + myRoom);
-  if (!myUid || !roomRef) { alert('STOP: uid ou roomRef manquant'); return; }
-  
   const snap = await roomRef.child('players/' + myUid).get();
   const me = snap.val();
-  alert('2 - me:' + JSON.stringify(me));
-  if (!me || me.blocked || me.buzzed) { alert('STOP: blocked=' + me?.blocked + ' buzzed=' + me?.buzzed); return; }
+  if (!me || me.blocked || me.buzzed) return;
 
-  const offsetSnap = await db.ref('.info/serverTimeOffset').get();
-  const offset = offsetSnap.val() || 0;
-  const serverNow = Date.now() + offset;
-  alert('3 - serverNow:' + serverNow);
+  // Délai : on utilise Date.now() directement (suffisant pour comparer les buzzers)
+  const serverNow = Date.now();
 
   const startSnap = await roomRef.child('musicStartTime').get();
   const startTime = startSnap.val() || 0;
   const delay = startTime > 0 ? Math.max(0, serverNow - startTime) : 0;
-  alert('4 - delay:' + delay + ' mode:' + gameMode);
 
   await roomRef.child('players/' + myUid).update({ buzzed: true, buzzTime: serverNow });
-  alert('5 - buzzed mis à jour');
 
   if (gameMode === 'queue') {
     const queueSnap = await roomRef.child('buzzerQueue').get();
     const queue = queueSnap.val() || {};
     const order = Object.keys(queue).length + 1;
     await roomRef.child('buzzerQueue/' + myUid).set({ name: me.name, delay, order });
+    // Coupe la musique uniquement au premier buzz
     if (order === 1) await roomRef.child('buzzedBy').set(myUid);
   } else {
+    // Mode classique : premier arrivé bloque tout
     const buzzSnap = await roomRef.child('buzzedBy').get();
-    alert('6 - buzzedBy actuel:' + buzzSnap.val());
     if (!buzzSnap.val()) await roomRef.child('buzzedBy').set(myUid);
   }
-  alert('7 - FINI');
 }
 
 // ── Actions MJ ────────────────────────────────────────
