@@ -517,6 +517,7 @@ function updateBuzzBtn(me) {
 
 // ── Buzz joueur ────────────────────────────────────────
 async function buzz() {
+  alert('buzz appelé - uid:' + myUid);
   const snap = await roomRef.child('players/' + myUid).get();
   const me = snap.val();
   if (!me || me.blocked || me.buzzed) return;
