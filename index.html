@@ -279,7 +279,10 @@ function show(id) {
   document.getElementById('screen-' + id).classList.add('active');
 }
 function log(msg) { document.getElementById('home-log').textContent = msg; }
-function genCode() { return Math.random().toString(36).substring(2, 6).toUpperCase(); }
+function genCode() {
+  const letters = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
+  return Array.from({length: 4}, () => letters[Math.floor(Math.random() * letters.length)]).join('');
+}
 function fmtDelay(ms) {
   if (!ms || ms <= 0) return '?';
   return (ms / 1000).toFixed(2) + 's';
