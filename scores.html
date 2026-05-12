@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blind Test Paradis — Scores</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: system-ui, sans-serif; background: #0a0a12; color: #f0eeff; min-height: 100vh; overflow: hidden; }
+
+  /* ── ECRAN D'ACCUEIL ── */
+  #screen-join { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 40px; }
+  .logo { font-size: 56px; font-weight: 700; letter-spacing: -2px; background: linear-gradient(135deg, #a78bfa, #f472b6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 8px; }
+  .tagline { color: #7c6fa0; font-size: 15px; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 60px; }
+  .join-card { background: #13111f; border: 1px solid #2a2440; border-radius: 20px; padding: 36px; width: 100%; max-width: 420px; text-align: center; }
+  .join-card h2 { font-size: 14px; color: #7c6fa0; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 20px; }
+  .code-input { width: 100%; background: #0a0a12; border: 2px solid #2a2440; border-radius: 12px; padding: 16px; color: #f0eeff; font-size: 32px; font-weight: 700; letter-spacing: 8px; text-align: center; text-transform: uppercase; outline: none; transition: border 0.2s; margin-bottom: 16px; }
+  .code-input:focus { border-color: #a78bfa; }
+  .btn-join { width: 100%; padding: 14px; border-radius: 12px; border: none; background: linear-gradient(135deg, #7c3aed, #db2777); color: white; font-size: 16px; font-weight: 700; cursor: pointer; transition: opacity 0.15s; }
+  .btn-join:hover { opacity: 0.9; }
+  .join-hint { font-size: 13px; color: #4a4060; margin-top: 12px; }
+  .join-error { font-size: 13px; color: #f472b6; margin-top: 10px; min-height: 20px; }
+
+  /* ── ECRAN SCORES ── */
+  #screen-scores { display: none; flex-direction: column; min-height: 100vh; padding: 32px 48px; gap: 24px; }
+
+  /* Header */
+  .scores-header { display: flex; align-items: center; justify-content: space-between; }
+  .scores-logo { font-size: 28px; font-weight: 700; background: linear-gradient(135deg, #a78bfa, #f472b6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .room-badge { background: #1a1630; border: 1px solid #2a2440; border-radius: 10px; padding: 8px 20px; font-size: 14px; color: #7c6fa0; }
+  .room-badge span { color: #a78bfa; font-weight: 700; font-size: 20px; letter-spacing: 3px; }
+  .now-playing-bar { flex: 1; text-align: center; font-size: 14px; color: #7c6fa0; padding: 0 32px; }
+  .now-playing-bar span { color: #f0eeff; font-weight: 600; }
+
+  /* Zone principale : scores à gauche, file à droite */
+  .main-area { display: flex; gap: 24px; flex: 1; }
+
+  /* Scores */
+  .scores-panel { flex: 1.4; display: flex; flex-direction: column; gap: 12px; }
+  .scores-title { font-size: 12px; color: #7c6fa0; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 4px; }
+  .score-row { display: flex; align-items: center; gap: 16px; background: #13111f; border: 1px solid #2a2440; border-radius: 16px; padding: 16px 24px; transition: all 0.4s ease; position: relative; overflow: hidden; }
+  .score-row.first  { border-color: #f59e0b; background: #1a1500; }
+  .score-row.second { border-color: #9ca3af; background: #111318; }
+  .score-row.third  { border-color: #b45309; background: #150e00; }
+  .score-row.buzzed-row { border-color: #f472b6; animation: pulse-pink 0.8s ease infinite; }
+  .rank-medal { font-size: 28px; width: 40px; text-align: center; flex-shrink: 0; }
+  .team-name { font-size: 22px; font-weight: 700; color: #f0eeff; flex: 1; }
+  .team-pts { font-size: 36px; font-weight: 800; color: #a78bfa; }
+  .team-pts.first-pts  { color: #f59e0b; }
+  .team-pts.second-pts { color: #c0c0c0; }
+  .team-pts.third-pts  { color: #cd7f32; }
+  .buzz-indicator { position: absolute; right: 20px; top: 50%; transform: translateY(-50%); font-size: 28px; animation: buzz-anim 0.5s ease infinite alternate; }
+
+  /* File d'attente */
+  .queue-panel { flex: 1; display: flex; flex-direction: column; }
+  .queue-title { font-size: 12px; color: #f472b6; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 12px; }
+  .queue-empty { color: #2a2440; font-size: 15px; text-align: center; margin-top: 40px; }
+  .queue-item { display: flex; align-items: center; gap: 14px; background: #13111f; border: 1px solid #2a2440; border-radius: 14px; padding: 14px 20px; margin-bottom: 10px; animation: slideIn 0.3s ease; }
+  .queue-item.q-first { border-color: #f472b6; background: #1a0d15; }
+  .queue-rank { font-size: 24px; width: 36px; text-align: center; flex-shrink: 0; }
+  .queue-name { font-size: 18px; font-weight: 700; color: #f0eeff; flex: 1; }
+  .queue-delay { font-size: 14px; color: #7c6fa0; background: #0a0a12; border-radius: 8px; padding: 4px 12px; white-space: nowrap; }
+
+  /* Buzzer géant (mode classique, quand quelqu'un buzze) */
+  .buzz-overlay { display: none; position: fixed; inset: 0; background: rgba(10,10,18,0.85); align-items: center; justify-content: center; flex-direction: column; gap: 20px; z-index: 100; backdrop-filter: blur(8px); }
+  .buzz-overlay.visible { display: flex; }
+  .buzz-name { font-size: 72px; font-weight: 800; background: linear-gradient(135deg, #f472b6, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-align: center; animation: popIn 0.3s ease; }
+  .buzz-label-big { font-size: 24px; color: #7c6fa0; letter-spacing: 4px; text-transform: uppercase; }
+  .buzz-emoji { font-size: 80px; animation: buzz-anim 0.4s ease infinite alternate; }
+
+  @keyframes pulse-pink {
+    0%,100% { box-shadow: 0 0 0 0 rgba(244,114,182,0); }
+    50%      { box-shadow: 0 0 0 10px rgba(244,114,182,0.2); }
+  }
+  @keyframes buzz-anim {
+    from { transform: translateY(-50%) rotate(-10deg) scale(1); }
+    to   { transform: translateY(-50%) rotate(10deg) scale(1.2); }
+  }
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateX(20px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+  @keyframes popIn {
+    from { opacity: 0; transform: scale(0.7); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══ SAISIE CODE ROOM ═══ -->
+<div id="screen-join">
+  <div class="logo">🎵 Blind Test</div>
+  <div class="tagline">Paradis — Écran de projection</div>
+  <div class="join-card">
+    <h2>Code de la room</h2>
+    <input class="code-input" id="code-input" maxlength="4" placeholder="ABCD" oninput="this.value=this.value.toUpperCase()" />
+    <button class="btn-join" onclick="connectRoom()">Afficher les scores →</button>
+    <div class="join-error" id="join-error"></div>
+    <div class="join-hint">Demande le code au Maître du Jeu</div>
+  </div>
+</div>
+
+<!-- ═══ ECRAN SCORES ═══ -->
+<div id="screen-scores">
+  <div class="scores-header">
+    <div class="scores-logo">🎵 Blind Test Paradis</div>
+    <div class="now-playing-bar">🎵 <span id="now-playing-text">—</span></div>
+    <div class="room-badge">Room <span id="room-display">----</span></div>
+  </div>
+
+  <div class="main-area">
+    <div class="scores-panel">
+      <div class="scores-title">🏆 Classement</div>
+      <div id="scores-list"></div>
+    </div>
+    <div class="queue-panel" id="queue-panel">
+      <div class="queue-title">📋 File d'attente</div>
+      <div id="queue-list"><div class="queue-empty">En attente de buzzers...</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- Overlay buzz classique -->
+<div class="buzz-overlay" id="buzz-overlay">
+  <div class="buzz-emoji">🔔</div>
+  <div class="buzz-name" id="buzz-overlay-name">—</div>
+  <div class="buzz-label-big">a buzzé !</div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyA88T-u3agLgxbGcJvYT0JgelIncyuVL8s",
+  authDomain: "blindtestparadis.firebaseapp.com",
+  databaseURL: "https://blindtestparadis-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "blindtestparadis",
+  storageBucket: "blindtestparadis.firebasestorage.app",
+  messagingSenderId: "124805001518",
+  appId: "1:124805001518:web:6604953e8192028e9c8abf",
+  measurementId: "G-ZQSZQP611J"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+const auth = firebase.auth();
+
+let roomCode = '';
+let gameMode = 'classic';
+
+// Pré-remplir depuis l'URL si ?room=ABCD
+window.addEventListener('load', () => {
+  auth.signInAnonymously();
+  const params = new URLSearchParams(window.location.search);
+  const r = params.get('room');
+  if (r) {
+    document.getElementById('code-input').value = r.toUpperCase();
+    connectRoom();
+  }
+});
+
+async function connectRoom() {
+  const code = document.getElementById('code-input').value.trim().toUpperCase();
+  if (code.length < 2) { document.getElementById('join-error').textContent = 'Entre le code de la room.'; return; }
+  const snap = await db.ref('rooms/' + code).get();
+  if (!snap.exists()) { document.getElementById('join-error').textContent = 'Room introuvable ! Vérifie le code.'; return; }
+  roomCode = code;
+  document.getElementById('room-display').textContent = roomCode;
+  // Met à jour l'URL pour pouvoir recharger sans retaper
+  history.replaceState(null, '', '?room=' + roomCode);
+  document.getElementById('screen-join').style.display = 'none';
+  document.getElementById('screen-scores').style.display = 'flex';
+  listenRoom();
+}
+
+function fmtDelay(ms) {
+  if (!ms || ms <= 0) return '?';
+  return (ms / 1000).toFixed(2) + 's';
+}
+
+function listenRoom() {
+  const roomRef = db.ref('rooms/' + roomCode);
+
+  // Mode de jeu
+  roomRef.child('mode').on('value', snap => {
+    gameMode = snap.val() || 'classic';
+    document.getElementById('queue-panel').style.display = gameMode === 'queue' ? 'flex' : 'none';
+  });
+
+  // Morceau en cours
+  roomRef.child('nowPlaying').on('value', snap => {
+    document.getElementById('now-playing-text').textContent = snap.val() || '—';
+  });
+
+  // Scores
+  roomRef.child('players').on('value', snap => {
+    const players = snap.val() || {};
+    renderScores(players);
+  });
+
+  // File d'attente
+  roomRef.child('buzzerQueue').on('value', snap => {
+    renderQueue(snap.val());
+  });
+
+  // Buzz classique — overlay
+  roomRef.child('buzzedBy').on('value', async snap => {
+    const uid = snap.val();
+    if (!uid || gameMode === 'queue') {
+      document.getElementById('buzz-overlay').classList.remove('visible');
+      return;
+    }
+    const playerSnap = await roomRef.child('players/' + uid).get();
+    const player = playerSnap.val();
+    if (player) {
+      document.getElementById('buzz-overlay-name').textContent = player.name;
+      document.getElementById('buzz-overlay').classList.add('visible');
+    }
+  });
+}
+
+function renderScores(players) {
+  const joueurs = Object.entries(players)
+    .filter(([, p]) => p.role !== 'mj')
+    .sort((a, b) => (b[1].score || 0) - (a[1].score || 0));
+
+  const medals = ['🥇', '🥈', '🥉'];
+  const rankClass = ['first', 'second', 'third'];
+  const ptsClass = ['first-pts', 'second-pts', 'third-pts'];
+
+  document.getElementById('scores-list').innerHTML = joueurs.map(([uid, p], i) => {
+    const isBuzzed = p.buzzed;
+    return `
+      <div class="score-row ${rankClass[i] || ''} ${isBuzzed && gameMode === 'queue' ? 'buzzed-row' : ''}">
+        <div class="rank-medal">${medals[i] || (i + 1)}</div>
+        <div class="team-name">${p.name}</div>
+        <div class="team-pts ${ptsClass[i] || ''}">${p.score || 0}<span style="font-size:18px;color:#4a4060;font-weight:400"> pt</span></div>
+        ${isBuzzed && gameMode === 'queue' ? '<div class="buzz-indicator">🔔</div>' : ''}
+      </div>`;
+  }).join('') || '<div style="color:#4a4060;font-size:15px;padding:20px;">En attente de joueurs...</div>';
+}
+
+function renderQueue(queue) {
+  const el = document.getElementById('queue-list');
+  if (!queue || !Object.keys(queue).length) {
+    el.innerHTML = '<div class="queue-empty">En attente de buzzers...</div>';
+    return;
+  }
+  const sorted = Object.entries(queue).sort((a, b) => a[1].order - b[1].order);
+  const medals = ['🥇', '🥈', '🥉'];
+  el.innerHTML = sorted.map(([, q], i) => `
+    <div class="queue-item ${i === 0 ? 'q-first' : ''}">
+      <div class="queue-rank">${medals[i] || (i + 1) + '.'}</div>
+      <div class="queue-name">${q.name}</div>
+      <div class="queue-delay">+${fmtDelay(q.delay)}</div>
+    </div>`
+  ).join('');
+}
+</script>
+</body>
+</html>
