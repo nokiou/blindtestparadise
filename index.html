@@ -112,6 +112,11 @@
   .file-item:hover { background: #1a1630; }
   .file-item.current { background: #1a1630; border: 1px solid #a78bfa; }
   .file-item-name { font-size: 13px; color: #f0eeff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
+  .ctrl-btn.revealed {
+  background: linear-gradient(135deg, #065f46, #10b981);
+  border-color: #10b981;
+  color: white;
+  }
 
   /* Player buzz screen */
   .buzz-container { display: flex; flex-direction: column; align-items: center; gap: 32px; }
@@ -214,7 +219,7 @@
       <button class="ctrl-btn play" onclick="togglePlay()" id="play-btn">▶ Lire</button>
       <button class="ctrl-btn stop" onclick="stopMusic()">⏹ Stop</button>
       <button class="ctrl-btn" onclick="nextTrack()">⏭ Suivant</button>
-      <button class="ctrl-btn" onclick="revealSong()" style="color:#10b981;border-color:#10b981;">🎵 Musique trouvée</button>
+      <button class="ctrl-btn" id="btn-reveal" onclick="revealSong()">🎵 Musique trouvée</button>
      <div class="now-playing">En cours : <span id="now-playing-name">—</span></div>     
     </div>
   </div>
@@ -660,7 +665,15 @@ async function recordMusicStart() {
 }
 
 async function revealSong() {
-  await roomRef.update({ songRevealed: true });
+  const btn = document.getElementById('btn-reveal');
+  const isRevealed = btn.classList.contains('revealed');
+  if (isRevealed) {
+    btn.classList.remove('revealed');
+    await roomRef.update({ songRevealed: false });
+  } else {
+    btn.classList.add('revealed');
+    await roomRef.update({ songRevealed: true });
+  }
 }
  
 async function playTrack(i) {
@@ -678,6 +691,7 @@ async function playTrack(i) {
   await roomRef.child('buzzerQueue').remove();
   await recordMusicStart();
   await roomRef.update({ songRevealed: false });
+ document.getElementById('btn-reveal')?.classList.remove('revealed');
 }
 
 async function togglePlay() {
@@ -721,12 +735,14 @@ async function stopMusic() {
   await roomRef.child('buzzedBy').set(null);
   await roomRef.child('buzzerQueue').remove();
  await roomRef.update({ songRevealed: false });
+ document.getElementById('btn-reveal')?.classList.remove('revealed');
 }
 
 async function nextTrack() {
   if (currentTab === 'mp3' && audioFiles.length > 0) {
     await playTrack((currentTrack + 1) % audioFiles.length);
    await roomRef.update({ songRevealed: false });
+   document.getElementById('btn-reveal')?.classList.remove('revealed');
   }
 }
 
