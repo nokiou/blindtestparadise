@@ -214,7 +214,8 @@
       <button class="ctrl-btn play" onclick="togglePlay()" id="play-btn">▶ Lire</button>
       <button class="ctrl-btn stop" onclick="stopMusic()">⏹ Stop</button>
       <button class="ctrl-btn" onclick="nextTrack()">⏭ Suivant</button>
-      <div class="now-playing">En cours : <span id="now-playing-name">—</span></div>
+      <button class="btn btn-secondary" onclick="revealSong()" style="color:#10b981;border-color:#10b981;">🎵 Musique trouvée</button>
+     <div class="now-playing">En cours : <span id="now-playing-name">—</span></div>     
     </div>
   </div>
 
@@ -267,6 +268,10 @@
       <div class="buzz-icon">🔔</div>
       <div class="buzz-label">BUZZER !</div>
     </button>
+   <div id="song-reveal" style="display:none;text-align:center;padding:16px 24px;background:#13111f;border:1px solid #a78bfa;border-radius:16px;max-width:320px;">
+  <div style="font-size:12px;color:#7c6fa0;text-transform:uppercase;letter-spacing:2px;margin-bottom:6px;">🎵 C'était...</div>
+  <div id="song-reveal-name" style="font-size:20px;font-weight:700;color:#f0eeff;"></div>
+</div>
     <div class="status-msg" id="player-status">Écoute la musique...</div>
   </div>
 </div>
@@ -511,6 +516,17 @@ function listenRoomPlayer() {
     else if (state === 'waiting') show('waiting');
   });
   roomRef.child('mode').on('value', snap => { if (snap.val()) gameMode = snap.val(); });
+ roomRef.child('songRevealed').on('value', async snap => {
+  const revealed = snap.val();
+  const el = document.getElementById('song-reveal');
+  if (revealed) {
+    const s = await roomRef.child('nowPlaying').get();
+    document.getElementById('song-reveal-name').textContent = s.val() || '—';
+    el.style.display = 'block';
+  } else {
+    el.style.display = 'none';
+  }
+});
 }
 
 function renderWaiting(players) {
@@ -643,6 +659,10 @@ async function recordMusicStart() {
   await roomRef.update({ musicStartTime: firebase.database.ServerValue.TIMESTAMP });
 }
 
+async function revealSong() {
+  await roomRef.update({ songRevealed: true });
+}
+ 
 async function playTrack(i) {
   currentTrack = i;
   const audio = document.getElementById('audio-player');
@@ -651,11 +671,13 @@ async function playTrack(i) {
   isPlaying = true;
   document.getElementById('play-btn').textContent = '⏸ Pause';
   document.getElementById('now-playing-name').textContent = audioFiles[i].name.replace(/\.[^.]+$/, '');
+  await roomRef.update({ nowPlaying: audioFiles[i].name.replace(/\.[^.]+$/, '') });
   document.querySelectorAll('.file-item').forEach((el, j) => el.classList.toggle('current', j === i));
   await roomRef.child('state').set('playing');
   await unblockAll();
   await roomRef.child('buzzerQueue').remove();
   await recordMusicStart();
+  await roomRef.update({ songRevealed: false });
 }
 
 async function togglePlay() {
@@ -698,11 +720,13 @@ async function stopMusic() {
   await roomRef.child('state').set('waiting');
   await roomRef.child('buzzedBy').set(null);
   await roomRef.child('buzzerQueue').remove();
+ await roomRef.update({ songRevealed: false });
 }
 
 async function nextTrack() {
   if (currentTab === 'mp3' && audioFiles.length > 0) {
     await playTrack((currentTrack + 1) % audioFiles.length);
+   await roomRef.update({ songRevealed: false });
   }
 }
 
@@ -739,6 +763,7 @@ async function toggleYT() {
       document.getElementById('play-btn').textContent = '▶ Lire';
     } else {
       ytPlayer.playVideo();
+      await roomRef.update({ nowPlaying: 'YouTube : ' + videoId });
       document.getElementById('play-btn').textContent = '⏸ Pause';
       await roomRef.child('state').set('playing');
       await unblockAll();
