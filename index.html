@@ -459,8 +459,8 @@ function renderQueue(queue) {
   }
   const sorted = Object.entries(queue).sort((a, b) => a[1].order - b[1].order);
   const medals = ['🥇', '🥈', '🥉'];
-  el.innerHTML = sorted.map(([uid, q], i) => `
-    <div class="queue-item">
+el.innerHTML = sorted.map(([uid, q], i) => `
+    <div class="queue-item ${i === 0 ? 'q-first' : ''}">
       <div class="queue-rank">${medals[i] || (i + 1) + '.'}</div>
       <div class="queue-name">${q.name}</div>
       <div class="queue-delay">+${fmtDelay(q.delay)}</div>
@@ -468,6 +468,7 @@ function renderQueue(queue) {
         <button class="queue-score-btn good" onclick="addScoreQueue('${uid}', 1)">+1</button>
         <button class="queue-score-btn good" onclick="addScoreQueue('${uid}', 2)">+2</button>
         <button class="queue-score-btn" onclick="addScoreQueue('${uid}', -1)">-1</button>
+        <button class="queue-score-btn" onclick="blockPlayer('${uid}')" style="border-color:#7c6fa0;color:#7c6fa0;">🔒</button>
       </div>
     </div>`
   ).join('');
