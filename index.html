@@ -358,6 +358,8 @@ function setMode(mode) {
 
 // ── Création room (MJ) ─────────────────────────────────
 async function createRoom() {
+  const mdp = prompt('Mot de passe MJ :');
+  if (mdp !== 'camping') { log('Mot de passe incorrect.'); return; }
   myName = document.getElementById('mj-name').value.trim();
   if (!myName) { log('Entre ton prénom !'); return; }
   if (!myUid) { log('Connexion en cours, réessaie...'); return; }
