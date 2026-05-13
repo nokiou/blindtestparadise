@@ -808,6 +808,17 @@ window.addEventListener('load', () => {
     document.getElementById('resume-label').innerHTML =
       `Room <strong style="color:#a78bfa;letter-spacing:2px">${saved.room}</strong> — reprendre en tant que MJ ?`;
   }
+ const params = new URLSearchParams(window.location.search);
+const joinCode = params.get('join');
+if (joinCode) {
+  document.getElementById('room-code-join').value = joinCode.toUpperCase();
+  // Cache la section MJ
+  document.querySelector('.divider').style.display = 'none';
+  document.getElementById('mj-name').style.display = 'none';
+  document.querySelector('[onclick="createRoom()"]').style.display = 'none';
+  // Cache aussi le bandeau de reprise de session
+  document.getElementById('resume-banner').style.display = 'none';
+}
 });
 </script>
 </body>
