@@ -149,6 +149,7 @@ const auth = firebase.auth();
 
 let roomCode = '';
 let gameMode = 'classic';
+let currentSong = '—';
 
 // Pré-remplir depuis l'URL si ?room=ABCD
 window.addEventListener('load', () => {
@@ -189,10 +190,19 @@ function listenRoom() {
     document.getElementById('queue-panel').style.display = gameMode === 'queue' ? 'flex' : 'none';
   });
 
-  // Morceau en cours
-  roomRef.child('nowPlaying').on('value', snap => {
-    document.getElementById('now-playing-text').textContent = snap.val() || '—';
+// Titre du morceau — affiché seulement quand révélé
+roomRef.child('songRevealed').on('value', snap => {
+  const revealed = snap.val();
+  document.getElementById('now-playing-text').textContent = revealed ? currentSong : '—';
+});
+
+roomRef.child('nowPlaying').on('value', snap => {
+  currentSong = snap.val() || '—';
+  // N'affiche que si déjà révélé
+  roomRef.child('songRevealed').get().then(s => {
+    if (s.val()) document.getElementById('now-playing-text').textContent = currentSong;
   });
+});
 
   // Scores
   roomRef.child('players').on('value', snap => {
