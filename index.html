@@ -205,6 +205,9 @@
         <div>Cliquer pour charger des MP3</div>
         <div style="font-size:12px;margin-top:4px;">ou glisser-déposer ici</div>
       </div>
+     <div style="display:flex;justify-content:flex-end;margin-top:8px;" id="shuffle-row" style="display:none">
+  <button class="btn-sm" onclick="shuffleFiles()" style="background:#1a1630;border:1px solid #2a2440;color:#a78bfa;font-size:13px;">🔀 Mélanger</button>
+</div>
       <input type="file" id="file-input" accept="audio/*" multiple style="display:none" onchange="loadFiles(this.files)" />
       <div class="file-list" id="file-list"></div>
     </div>
@@ -654,6 +657,21 @@ function switchTab(tab, el) {
   document.getElementById('tab-' + tab).classList.add('active');
 }
 
+function shuffleFiles() {
+  // Fisher-Yates shuffle
+  for (let i = audioFiles.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [audioFiles[i], audioFiles[j]] = [audioFiles[j], audioFiles[i]];
+  }
+  currentTrack = -1;
+  // Rafraîchit la liste affichée
+  document.getElementById('file-list').innerHTML = audioFiles.map((f, i) =>
+    `<div class="file-item" id="fi-${i}" onclick="playTrack(${i})">
+      <span class="file-item-name">🎵 ${f.name.replace(/\.[^.]+$/, '')}</span>
+    </div>`
+  ).join('');
+}
+ 
 function loadFiles(files) {
   audioFiles = Array.from(files);
   document.getElementById('file-list').innerHTML = audioFiles.map((f, i) =>
@@ -661,6 +679,7 @@ function loadFiles(files) {
       <span class="file-item-name">🎵 ${f.name.replace(/\.[^.]+$/, '')}</span>
     </div>`
   ).join('');
+ document.getElementById('shuffle-row').style.display = 'flex';
 }
 
 async function recordMusicStart() {
