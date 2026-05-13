@@ -6,25 +6,6 @@
 <title>Blind Test Paradis — Scores</title>
  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎵</text></svg>">
 <style>
- #screen-home {
-  position: relative;
-  background-image: url('bg.png');
-  background-size: cover;
-  background-position: center;
-}
-
-#screen-home::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: rgba(10, 10, 18, 0.75);
-  z-index: 0;
-}
-
-#screen-home > * {
-  position: relative;
-  z-index: 1;
-}
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: system-ui, sans-serif; background: #0a0a12; color: #f0eeff; min-height: 100vh; overflow: hidden; }
 
@@ -110,8 +91,8 @@
 
 <!-- ═══ SAISIE CODE ROOM ═══ -->
 <div id="screen-join">
-  <div class="logo">🎵 Blind Test</div>
-  <div class="tagline">Paradis — Écran de projection</div>
+  <div class="logo">🎵 Blind Test Paradise</div>
+  <div class="tagline">Écran de projection</div>
   <div class="join-card">
     <h2>Code de la room</h2>
     <input class="code-input" id="code-input" maxlength="4" placeholder="ABCD" oninput="this.value=this.value.toUpperCase()" />
@@ -124,7 +105,7 @@
 <!-- ═══ ECRAN SCORES ═══ -->
 <div id="screen-scores">
   <div class="scores-header">
-    <div class="scores-logo">🎵 Blind Test Paradis</div>
+    <div class="scores-logo">🎵 Blind Test Paradise</div>
     <div class="now-playing-bar">🎵 <span id="now-playing-text">—</span></div>
     <div class="room-badge">Room <span id="room-display">----</span></div>
   </div>
