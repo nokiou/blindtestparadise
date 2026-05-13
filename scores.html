@@ -106,7 +106,12 @@
 <div id="screen-scores">
   <div class="scores-header">
     <div class="scores-logo">🎵 Blind Test Paradise</div>
-    <div class="now-playing-bar">🎵 <span id="now-playing-text">—</span></div>
+    <div class="now-playing-bar">
+  <div id="now-playing-box" style="display:none;background:#13111f;border:1px solid #a78bfa;border-radius:12px;padding:10px 28px;text-align:center;">
+    <div style="font-size:11px;color:#7c6fa0;text-transform:uppercase;letter-spacing:2px;margin-bottom:4px;">🎵 C'était...</div>
+    <div id="now-playing-text" style="font-size:24px;font-weight:700;color:#f0eeff;">—</div>
+  </div>
+</div>
     <div class="room-badge">Room <span id="room-display">----</span></div>
   </div>
 
@@ -193,14 +198,17 @@ function listenRoom() {
 // Titre du morceau — affiché seulement quand révélé
 roomRef.child('songRevealed').on('value', snap => {
   const revealed = snap.val();
+  document.getElementById('now-playing-box').style.display = revealed ? 'block' : 'none';
   document.getElementById('now-playing-text').textContent = revealed ? currentSong : '—';
 });
 
 roomRef.child('nowPlaying').on('value', snap => {
   currentSong = snap.val() || '—';
-  // N'affiche que si déjà révélé
   roomRef.child('songRevealed').get().then(s => {
-    if (s.val()) document.getElementById('now-playing-text').textContent = currentSong;
+    if (s.val()) {
+      document.getElementById('now-playing-text').textContent = currentSong;
+      document.getElementById('now-playing-box').style.display = 'block';
+    }
   });
 });
 
