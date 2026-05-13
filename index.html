@@ -177,6 +177,10 @@
   <div class="header">
     <div style="font-size:18px;font-weight:700;color:#a78bfa;">🎛 Maître du Jeu</div>
     <div class="room-code">Room : <span id="display-code">----</span></div>
+<a id="scores-link" href="#" target="_blank"
+   style="padding:8px 16px;border-radius:10px;border:1px solid #2a2440;color:#a78bfa;font-size:13px;font-weight:600;text-decoration:none;background:#0a0a12;">
+  📊 Ouvrir les scores
+</a>
     <div class="mode-toggle">
       <button class="mode-btn active" id="mode-btn-classic" onclick="setMode('classic')">⚡ Classique</button>
       <button class="mode-btn" id="mode-btn-queue" onclick="setMode('queue')">📋 File d'attente</button>
@@ -350,6 +354,7 @@ async function createRoom() {
   myRole = 'mj';
   myRoom = genCode();
   document.getElementById('display-code').textContent = myRoom;
+  document.getElementById('scores-link').href = 'scores.html?room=' + myRoom;
   roomRef = db.ref('rooms/' + myRoom);
   await roomRef.set({ created: Date.now(), state: 'waiting', buzzedBy: null, mode: 'classic', musicStartTime: 0 });
   await roomRef.child('players/' + myUid).set({ name: myName, role: 'mj', score: 0, blocked: false, buzzed: false });
