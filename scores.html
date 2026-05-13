@@ -6,6 +6,25 @@
 <title>Blind Test Paradis — Scores</title>
  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎵</text></svg>">
 <style>
+ #screen-home {
+  position: relative;
+  background-image: url('bg.png');
+  background-size: cover;
+  background-position: center;
+}
+
+#screen-home::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(10, 10, 18, 0.75);
+  z-index: 0;
+}
+
+#screen-home > * {
+  position: relative;
+  z-index: 1;
+}
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: system-ui, sans-serif; background: #0a0a12; color: #f0eeff; min-height: 100vh; overflow: hidden; }
 
