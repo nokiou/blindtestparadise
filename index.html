@@ -449,6 +449,10 @@ roomRef.child('buzzedBy').on('value', async snap => {
     await roomRef.child('players').update(updates);
   }
 });
+   roomRef.child('mode').on('value', snap => {
+    if (snap.val() && snap.val() !== gameMode) { gameMode = snap.val(); setMode(gameMode); }
+  });
+}
 
 function renderPlayersMJ(players) {
   const grid = document.getElementById('players-grid');
