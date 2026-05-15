@@ -500,14 +500,18 @@ async function addScoreQueue(uid, pts) {
 async function clearQueue() {
   await roomRef.child('buzzerQueue').remove();
   await roomRef.child('buzzedBy').set(null);
-  // Réinitialise l'état buzzed de tous les joueurs
   const snap = await roomRef.child('players').get();
   const players = snap.val() || {};
   const updates = {};
   Object.entries(players).forEach(([uid, p]) => {
-    if (p.role !== 'mj') updates[uid + '/buzzed'] = false;
+    if (p.role !== 'mj') {
+      updates[uid + '/buzzed'] = false;
+      updates[uid + '/blocked'] = false;
+    }
   });
   await roomRef.child('players').update(updates);
+  // On remet musicStartTime pour recalculer les délais correctement
+  await recordMusicStart();
   resumeAudio();
 }
 
