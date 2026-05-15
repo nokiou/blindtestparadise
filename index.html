@@ -430,13 +430,21 @@ function listenRoomMJ() {
   roomRef.child('buzzerQueue').on('value', snap => {
     renderQueue(snap.val());
   });
-  roomRef.child('buzzedBy').on('value', snap => {
-    if (snap.val()) pauseAudio();
-  });
-  roomRef.child('mode').on('value', snap => {
-    if (snap.val() && snap.val() !== gameMode) { gameMode = snap.val(); setMode(gameMode); }
-  });
-}
+roomRef.child('buzzedBy').on('value', async snap => {
+  const uid = snap.val();
+  if (!uid) return;
+  pauseAudio();
+  if (gameMode === 'classic') {
+    // Bloque tous les autres joueurs côté Firebase
+    const playersSnap = await roomRef.child('players').get();
+    const players = playersSnap.val() || {};
+    const updates = {};
+    Object.entries(players).forEach(([pid, p]) => {
+      if (p.role !== 'mj' && pid !== uid) updates[pid + '/blocked'] = true;
+    });
+    await roomRef.child('players').update(updates);
+  }
+});
 
 function renderPlayersMJ(players) {
   const grid = document.getElementById('players-grid');
