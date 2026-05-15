@@ -729,10 +729,10 @@ async function togglePlay() {
   } else {
     if (currentTrack === -1 && audioFiles.length > 0) { await playTrack(0); return; }
     if (audio.src) {
-      await audio.play(); isPlaying = true;
-      document.getElementById('play-btn').textContent = '⏸ Pause';
+      // En mode queue, nettoie la file avant de relancer
+      if (gameMode === 'queue') await clearQueue();
+      else await resumeAudio();
       await roomRef.child('state').set('playing');
-      await recordMusicStart();
     }
   }
 }
